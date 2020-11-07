@@ -2,16 +2,25 @@ package org.log.controller;
 
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.stage.FileChooser;
+import javafx.stage.Modality;
 import javafx.stage.Stage;
+import javafx.stage.StageStyle;
 import org.log.entities.Filter;
 import org.log.persistance.FilePersistor;
 import org.log.service.LogFileInteractor;
-import org.log.usecases.*;
+import org.log.usecases.FilterReader;
+import org.log.usecases.LogFileExporterImpl;
+import org.log.usecases.LogFileFilterImpl;
+import org.log.usecases.LogFileOpenerImpl;
 
 import java.io.File;
+import java.io.IOException;
 import java.net.URL;
 import java.util.*;
 
@@ -119,12 +128,17 @@ public class MainController implements Initializable {
     }
 
     public void handleOnEditFiltersClick(ActionEvent actionEvent) {
-        FilterCreator filterCreator = new FilterCreator(new FilePersistor());
-        System.out.println(filterCreator.create("filterName", "filters!!"));
-
-        FilterReader filterReader = new FilterReader(new FilePersistor());
-        List<Filter> filterList = filterReader.read();
-
-        filterList.forEach(System.out::println);
+        try {
+            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getClassLoader().getResource("EditFilters.fxml"));
+            Parent editScene = fxmlLoader.load();
+            Stage stage = new Stage();
+            stage.initModality(Modality.APPLICATION_MODAL);
+            stage.initStyle(StageStyle.UTILITY);
+            stage.setTitle("Edit Filters");
+            stage.setScene(new Scene(editScene));
+            stage.show();
+        } catch (IOException e) {
+            System.out.println("Could not load edit stage: " + e);
+        }
     }
 }
