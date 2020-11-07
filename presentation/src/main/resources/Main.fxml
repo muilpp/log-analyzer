@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<BorderPane prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.log.controller.MainController">
+
+    <top>
+       <MenuBar fx:id="menuBar">
+           <Menu text="File">
+               <MenuItem fx:id="openFileMenu" onAction="#handleOpenFileMenuClick" text="Open file.." />
+               <MenuItem fx:id="exportFileMenu" onAction="#handleExportFileMenuClick" text="Export file.." />
+               <SeparatorMenuItem/>
+               <MenuItem fx:id="exitFileMenu" onAction="#handleExitMenuClick" text="Exit" />
+           </Menu>
+           <Menu text="Filters">
+               <CheckMenuItem fx:id="connectivityFilterMenu" onAction="#handleConnectivityFilterClick" text="Connectivity" />
+               <CheckMenuItem fx:id="georedFilterMenu" onAction="#handleGeoredFilterClick" text="Geored" />
+               <CheckMenuItem fx:id="rptFilterMenu" text="RTP" />
+               <CheckMenuItem fx:id="sipFilterMenu" text="SIP" />
+               <SeparatorMenuItem/>
+               <MenuItem fx:id="editFilters" onAction="#handleOnEditFiltersClick" text="Edit Filters" />
+           </Menu>
+       </MenuBar>
+   </top>
+
+    <center>
+        <ListView fx:id="logFileList" />
+    </center>
+</BorderPane>
