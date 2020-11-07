@@ -1,6 +1,6 @@
 package org.log.usecases;
 
-import org.log.ports.out.LogFileExporter;
+import org.log.ports.logfile.LogFileExporter;
 
 import java.io.File;
 import java.io.IOException;

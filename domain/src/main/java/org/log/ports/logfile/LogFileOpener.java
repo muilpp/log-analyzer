@@ -1,4 +1,4 @@
-package org.log.ports.in;
+package org.log.ports.logfile;
 
 import java.util.List;
 

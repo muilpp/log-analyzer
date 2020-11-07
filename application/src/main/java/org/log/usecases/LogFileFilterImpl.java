@@ -1,6 +1,6 @@
 package org.log.usecases;
 
-import org.log.ports.in.LogFileFilter;
+import org.log.ports.logfile.LogFileFilter;
 
 import java.util.List;
 import java.util.function.Predicate;
@@ -11,6 +11,10 @@ public class LogFileFilterImpl implements LogFileFilter {
     @Override
     public List<String> filterListBy(List<String> originalList, List<String> wordsToFilter) {
         LogFilterPredicate logFilterPredicate = new LogFilterPredicate(wordsToFilter);
+
+        System.out.println("Words to filter:");
+        wordsToFilter.forEach(System.out::println);
+
         return originalList.stream().filter(logFilterPredicate).collect(Collectors.toList());
     }
 

@@ -9,12 +9,15 @@
         <module>domain</module>
         <module>application</module>
         <module>presentation</module>
+        <module>infrastructure</module>
     </modules>
+
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.source>11</maven.compiler.source>
         <maven.compiler.target>11</maven.compiler.target>
     </properties>
+
     <build>
         <plugins>
             <plugin>

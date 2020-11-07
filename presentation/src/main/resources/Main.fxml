@@ -13,13 +13,9 @@
                <SeparatorMenuItem/>
                <MenuItem fx:id="exitFileMenu" onAction="#handleExitMenuClick" text="Exit" />
            </Menu>
-           <Menu text="Filters">
-               <CheckMenuItem fx:id="connectivityFilterMenu" onAction="#handleConnectivityFilterClick" text="Connectivity" />
-               <CheckMenuItem fx:id="georedFilterMenu" onAction="#handleGeoredFilterClick" text="Geored" />
-               <CheckMenuItem fx:id="rptFilterMenu" text="RTP" />
-               <CheckMenuItem fx:id="sipFilterMenu" text="SIP" />
-               <SeparatorMenuItem/>
+           <Menu fx:id="filtersMenu" text="Filters">
                <MenuItem fx:id="editFilters" onAction="#handleOnEditFiltersClick" text="Edit Filters" />
+               <SeparatorMenuItem/>
            </Menu>
        </MenuBar>
    </top>

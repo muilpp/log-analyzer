@@ -1,6 +1,6 @@
 package org.log.usecases;
 
-import org.log.ports.in.LogFileOpener;
+import org.log.ports.logfile.LogFileOpener;
 
 import java.io.File;
 import java.io.FileNotFoundException;

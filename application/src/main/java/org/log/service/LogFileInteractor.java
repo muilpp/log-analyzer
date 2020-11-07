@@ -1,8 +1,8 @@
 package org.log.service;
 
-import org.log.ports.in.LogFileFilter;
-import org.log.ports.in.LogFileOpener;
-import org.log.ports.out.LogFileExporter;
+import org.log.ports.logfile.LogFileFilter;
+import org.log.ports.logfile.LogFileOpener;
+import org.log.ports.logfile.LogFileExporter;
 
 import java.io.File;
 import java.util.List;
