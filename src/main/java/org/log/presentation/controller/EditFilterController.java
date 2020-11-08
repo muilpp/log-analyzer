@@ -20,7 +20,6 @@ import org.log.infrastructure.FilePersistor;
 
 import java.io.IOException;
 import java.net.URL;
-import java.nio.file.Paths;
 import java.util.List;
 import java.util.ResourceBundle;
 
@@ -81,8 +80,13 @@ public class EditFilterController implements Initializable{
 
     public void handleOnCreateFilterClick(ActionEvent actionEvent) {
         try {
-            URL url = Paths.get("./src/main/resources/NewFilterDialog.fxml").toUri().toURL();
-            Parent newFilterScene = FXMLLoader.load(url);
+            FXMLLoader loader = new FXMLLoader();
+            loader.setLocation(getClass().getResource("/NewFilterDialog.fxml"));
+            Parent newFilterScene = loader.load();
+
+            //URL url = Paths.get("./src/main/resources/NewFilterDialog.fxml").toUri().toURL();
+            //Parent newFilterScene = FXMLLoader.load(url);
+
             Stage stage = new Stage();
             stage.initModality(Modality.APPLICATION_MODAL);
             stage.initStyle(StageStyle.UTILITY);

@@ -7,8 +7,6 @@ import javafx.scene.Scene;
 import javafx.stage.Stage;
 
 import java.io.IOException;
-import java.net.URL;
-import java.nio.file.Paths;
 
 public class App extends Application {
 
@@ -18,8 +16,12 @@ public class App extends Application {
     public void start(Stage stage) throws IOException {
         window = stage;
 
-        URL url = Paths.get("./src/main/resources/Main.fxml").toUri().toURL();
-        Parent root = FXMLLoader.load(url);
+        FXMLLoader loader = new FXMLLoader();
+        loader.setLocation(getClass().getResource("/Main.fxml"));
+        Parent root = loader.load();
+
+        //URL url = Paths.get("./src/main/resources/Main.fxml").toUri().toURL();
+        //Parent root = FXMLLoader.load(url);
         //Parent root = FXMLLoader.load(getClass().getClassLoader().getResource("/Main.fxml"));
         window.setTitle("Log Analyzer");
         Scene scene = new Scene(root);

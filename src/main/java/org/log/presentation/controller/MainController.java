@@ -24,7 +24,6 @@ import org.log.infrastructure.FilePersistor;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
-import java.nio.file.Paths;
 import java.util.*;
 
 public class MainController implements Initializable {
@@ -149,8 +148,13 @@ public class MainController implements Initializable {
 
     public void handleOnEditFiltersClick(ActionEvent actionEvent) {
         try {
-            URL url = Paths.get("./src/main/resources/EditFilters.fxml").toUri().toURL();
-            Parent editScene = FXMLLoader.load(url);
+            //URL url = Paths.get("./src/main/resources/EditFilters.fxml").toUri().toURL();
+            //Parent editScene = FXMLLoader.load(url);
+
+            FXMLLoader loader = new FXMLLoader();
+            loader.setLocation(getClass().getResource("/EditFilters.fxml"));
+            Parent editScene = loader.load();
+
             Stage stage = new Stage();
             stage.initOwner((menuBar.getScene().getWindow()));
             stage.initModality(Modality.APPLICATION_MODAL);
