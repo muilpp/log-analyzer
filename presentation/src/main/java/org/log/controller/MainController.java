@@ -7,6 +7,8 @@ import javafx.fxml.Initializable;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
 import javafx.stage.FileChooser;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
@@ -36,21 +38,32 @@ public class MainController implements Initializable {
     public MenuItem editFilters;
     @FXML
     public ListView<String> logFileList;
+    @FXML
+    public TextArea manualFilterText;
 
     private List<String> originalList;
-    private final List<String> wordsToFilter = new ArrayList<>();
+    private final List<String> manualFilters = new ArrayList<>();
+    private final List<String> selectedFilters = new ArrayList<>();
     private LogFileInteractor logFileInteractor;
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
         logFileInteractor = new LogFileInteractor(new LogFileFilterImpl(), new LogFileOpenerImpl(), new LogFileExporterImpl());
         loadFilterMenu();
+
+        manualFilterText.addEventFilter(KeyEvent.KEY_PRESSED, keyEvent -> {
+            if (keyEvent.getCode().equals(KeyCode.ENTER)) {
+                keyEvent.consume(); // necessary to prevent event handlers for this event
+                handleManualFilterClick(null);
+            }
+        });
     }
 
     public void loadFilterMenu() {
         //This is done to reload elements after coming back from the EditFilter menu, would be better to have listeners instead of this
         //https://stackoverflow.com/questions/29639881/javafx-how-to-use-a-method-in-a-controller-from-another-controller
         filtersMenu.getItems().removeIf(item -> (item instanceof CheckMenuItem));
+        selectedFilters.clear();
         FilterReader filterReader = new FilterReader(new FilePersistor());
         List<Filter> filterList = filterReader.read();
 
@@ -78,10 +91,10 @@ public class MainController implements Initializable {
             String[] dataSplit = filterData.split("\\|");
             if (menuItem.isSelected()) {
                 System.out.println("Adding filter: " + filterData);
-                wordsToFilter.addAll(Arrays.asList(dataSplit));
+                selectedFilters.addAll(Arrays.asList(dataSplit));
             } else {
                 System.out.println("Removing filter: " + filterData);
-                wordsToFilter.removeAll(Arrays.asList(dataSplit));
+                selectedFilters.removeAll(Arrays.asList(dataSplit));
             }
         } else System.out.println("No filter found");
 
@@ -89,7 +102,10 @@ public class MainController implements Initializable {
     }
 
     private void filterLog() {
-        List<String> filteredList = logFileInteractor.filterListBy(originalList, wordsToFilter);
+        final List<String> allFilters = new ArrayList<>(selectedFilters);
+        allFilters.addAll(manualFilters);
+
+        List<String> filteredList = logFileInteractor.filterListBy(originalList, allFilters);
         logFileList.getItems().clear();
         logFileList.getItems().addAll(filteredList);
         System.out.println("List size after filtering: " + logFileList.getItems().size());
@@ -146,5 +162,18 @@ public class MainController implements Initializable {
         } catch (IOException e) {
             System.out.println("Could not load edit stage: " + e);
         }
+    }
+
+    public void handleManualFilterClick(ActionEvent actionEvent) {
+        manualFilters.clear();
+        String[] manualFilter = manualFilterText.getText().split("\\|");
+
+        for (String filter : manualFilter) {
+            if (!filter.isBlank()) {
+                manualFilters.add(filter);
+            }
+        }
+
+        filterLog();
     }
 }

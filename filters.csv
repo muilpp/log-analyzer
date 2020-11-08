@@ -1,3 +1,4 @@
-georedundancy,GeoredConnectivityInteractorImpl|veritate
-connectivity,SocketConnectivityInteractor
-Sip,SipEvent|RtpEvent
+veritate,veritate
+geored,updateLastGeored|checkTo|Active threads
+sip,INVITE
+rtp,"received "
