@@ -8,6 +8,7 @@ import org.log.entities.Filter;
 import org.log.ports.filter.FilterRepository;
 
 import java.io.BufferedWriter;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Reader;
 import java.nio.file.Files;
@@ -28,19 +29,14 @@ public class FilePersistor implements FilterRepository {
              CSVParser csvParser = new CSVParser(reader, CSVFormat.DEFAULT)) {
 
             for (CSVRecord csvRecord : csvParser) {
-                String filterName = csvRecord.get(0);
-                String filterData = csvRecord.get(1);
-
-//                System.out.println("Record No - " + csvRecord.getRecordNumber());
-//                System.out.println("---------------");
-//                System.out.println("Name : " + filterName);
-//                System.out.println("Data : " + filterData);
-//                System.out.println("---------------\n\n");
-
-                filterList.add(new Filter(filterName, filterData));
+                //if (csvRecord.size() == 2) {
+                    String filterName = csvRecord.get(0);
+                    String filterData = csvRecord.get(1);
+                    filterList.add(new Filter(filterName, filterData));
+                //}
             }
         } catch (IOException e) {
-            System.out.println("Error creating filter: " + e);
+            System.out.println("Error fetching filters: " + e);
         }
 
         return filterList;
@@ -48,6 +44,8 @@ public class FilePersistor implements FilterRepository {
 
     @Override
     public boolean create(String filterName, String filterData) {
+        //TODO Check filtername doesn't already exist!
+        System.out.println("Create filter with name: " + filterName);
         try (BufferedWriter writer = Files.newBufferedWriter(Paths.get(FILTERS_FILENAME), APPEND, CREATE);
              CSVPrinter csvPrinter = new CSVPrinter(writer, CSVFormat.DEFAULT)) {
 
@@ -63,7 +61,60 @@ public class FilePersistor implements FilterRepository {
     }
 
     @Override
-    public boolean delete(String filterName) {
+    public boolean update(String filterName, String filterData) {
+        List<Filter> filterList = new ArrayList<>();
+        try (Reader reader = Files.newBufferedReader(Paths.get(FILTERS_FILENAME));
+             CSVParser csvParser = new CSVParser(reader, CSVFormat.DEFAULT)) {
+
+            for (CSVRecord csvRecord : csvParser) {
+                Filter filter;
+                if (csvRecord.get(0).equalsIgnoreCase(filterName)) {
+                    System.out.println("Found filter, edit with: " + filterData);
+                    filter = new Filter(csvRecord.get(0), filterData);
+                } else {
+                    System.out.println("Filter not found yet...: " + csvRecord.get(0));
+                    filter = new Filter(csvRecord.get(0), csvRecord.get(1));
+                }
+                filterList.add(filter);
+            }
+            return overrideFilterFile(filterList);
+        } catch (IOException e) {
+            System.out.println("Error updating filters: " + e);
+        }
         return false;
+    }
+
+    private boolean overrideFilterFile(List<Filter> filterList) {
+        try (FileWriter fileWriter = new FileWriter(FILTERS_FILENAME);
+             CSVPrinter csvPrinter = new CSVPrinter(fileWriter, CSVFormat.DEFAULT)) {
+
+            filterList.forEach(filter -> {
+                try {
+                    System.out.println("Adding to file: " + filter.getFilterName() + ": " + filter.getFilterData());
+                    csvPrinter.printRecord(filter.getFilterName(), filter.getFilterData());
+                    csvPrinter.flush();
+                } catch (IOException e) {
+                    System.out.println("Error saving to filter file: " + e);
+                }
+            });
+
+            return true;
+        } catch (IOException e) {
+            System.out.println("Error overriding filter file: " + e);
+            return false;
+        }
+    }
+
+    @Override
+    public boolean delete(String filterName) {
+        final List<Filter> updatedFilterList = new ArrayList<>();
+
+        findAll().forEach(filter -> {
+            if (!filter.getFilterName().equalsIgnoreCase(filterName)) {
+                updatedFilterList.add(filter);
+            }
+        });
+
+        return overrideFilterFile(updatedFilterList);
     }
 }

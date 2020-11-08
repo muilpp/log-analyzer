@@ -44,10 +44,13 @@ public class MainController implements Initializable {
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
         logFileInteractor = new LogFileInteractor(new LogFileFilterImpl(), new LogFileOpenerImpl(), new LogFileExporterImpl());
-        initFilterMenu();
+        loadFilterMenu();
     }
 
-    private void initFilterMenu() {
+    public void loadFilterMenu() {
+        //This is done to reload elements after coming back from the EditFilter menu, would be better to have listeners instead of this
+        //https://stackoverflow.com/questions/29639881/javafx-how-to-use-a-method-in-a-controller-from-another-controller
+        filtersMenu.getItems().removeIf(item -> (item instanceof CheckMenuItem));
         FilterReader filterReader = new FilterReader(new FilePersistor());
         List<Filter> filterList = filterReader.read();
 
@@ -132,10 +135,13 @@ public class MainController implements Initializable {
             FXMLLoader fxmlLoader = new FXMLLoader(getClass().getClassLoader().getResource("EditFilters.fxml"));
             Parent editScene = fxmlLoader.load();
             Stage stage = new Stage();
+            stage.initOwner((menuBar.getScene().getWindow()));
             stage.initModality(Modality.APPLICATION_MODAL);
             stage.initStyle(StageStyle.UTILITY);
             stage.setTitle("Edit Filters");
             stage.setScene(new Scene(editScene));
+            //when closing edit filter, reload menu
+            stage.setOnHidden(e -> loadFilterMenu());
             stage.show();
         } catch (IOException e) {
             System.out.println("Could not load edit stage: " + e);

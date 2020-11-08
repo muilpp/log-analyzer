@@ -6,7 +6,7 @@ import org.log.ports.filter.FilterRepository;
 import java.util.List;
 
 public class FilterReader {
-    private FilterRepository filterRepository;
+    private final FilterRepository filterRepository;
 
     public FilterReader(FilterRepository filterRepository) {
         this.filterRepository = filterRepository;

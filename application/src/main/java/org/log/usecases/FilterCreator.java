@@ -5,7 +5,7 @@ import org.log.ports.filter.FilterRepository;
 
 public class FilterCreator {
 
-    private FilterRepository filterRepository;
+    private final FilterRepository filterRepository;
 
     public FilterCreator(FilterRepository filterRepository) {
         this.filterRepository = filterRepository;
