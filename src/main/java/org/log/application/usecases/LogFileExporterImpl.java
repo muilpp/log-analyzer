@@ -12,8 +12,7 @@ public class LogFileExporterImpl implements LogFileExporter {
     @Override
     public boolean exportLogToFile(File file, List<String> logFileList) {
         try {
-            PrintWriter writer;
-            writer = new PrintWriter(file);
+            PrintWriter writer = new PrintWriter(file);
 
             for (String logLine : logFileList) {
                 writer.println(logLine);
