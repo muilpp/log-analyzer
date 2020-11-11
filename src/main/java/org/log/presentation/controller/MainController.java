@@ -126,6 +126,8 @@ public class MainController implements Initializable {
 
         if (logFile != null) {
             System.out.println("Log file selected: " + logFile.getAbsolutePath());
+            Stage stage = (Stage) manualFilterIncludeText.getScene().getWindow();
+            stage.setTitle(logFile.getName());
             openLogFile(logFile.getPath());
         } else {
             System.out.println("Could not open the fucking file!");
