@@ -39,10 +39,11 @@ public class MainController implements Initializable {
     @FXML
     public ListView<String> logFileList;
     @FXML
-    public TextArea manualFilterText;
+    public TextArea manualFilterIncludeText, manualFilterExcludeText;
 
     private List<String> originalList;
-    private final List<String> manualFilters = new ArrayList<>();
+    private final List<String> manualFiltersToInclude = new ArrayList<>();
+    private final List<String> manualFiltersToExclude = new ArrayList<>();
     private final List<String> selectedFilters = new ArrayList<>();
     private LogFileInteractor logFileInteractor;
 
@@ -51,7 +52,14 @@ public class MainController implements Initializable {
         logFileInteractor = new LogFileInteractor(new LogFileFilterImpl(), new LogFileOpenerImpl(), new LogFileExporterImpl());
         loadFilterMenu();
 
-        manualFilterText.addEventFilter(KeyEvent.KEY_PRESSED, keyEvent -> {
+        manualFilterIncludeText.addEventFilter(KeyEvent.KEY_PRESSED, keyEvent -> {
+            if (keyEvent.getCode().equals(KeyCode.ENTER)) {
+                keyEvent.consume(); // necessary to prevent event handlers for this event
+                handleManualFilterClick(null);
+            }
+        });
+
+        manualFilterExcludeText.addEventFilter(KeyEvent.KEY_PRESSED, keyEvent -> {
             if (keyEvent.getCode().equals(KeyCode.ENTER)) {
                 keyEvent.consume(); // necessary to prevent event handlers for this event
                 handleManualFilterClick(null);
@@ -102,10 +110,10 @@ public class MainController implements Initializable {
     }
 
     private void filterLog() {
-        final List<String> allFilters = new ArrayList<>(selectedFilters);
-        allFilters.addAll(manualFilters);
+        final List<String> filtersToInclude = new ArrayList<>(selectedFilters);
+        filtersToInclude.addAll(manualFiltersToInclude);
 
-        List<String> filteredList = logFileInteractor.filterListBy(originalList, allFilters);
+        List<String> filteredList = logFileInteractor.filterListBy(originalList, filtersToInclude, manualFiltersToExclude);
         logFileList.getItems().clear();
         logFileList.getItems().addAll(filteredList);
         System.out.println("List size after filtering: " + logFileList.getItems().size());
@@ -170,15 +178,34 @@ public class MainController implements Initializable {
     }
 
     public void handleManualFilterClick(ActionEvent actionEvent) {
-        manualFilters.clear();
-        String[] manualFilter = manualFilterText.getText().split("\\|");
+        updateManualFilters();
+        filterLog();
+    }
 
-        for (String filter : manualFilter) {
-            if (!filter.isBlank()) {
-                manualFilters.add(filter);
+    private void updateManualFilters() {
+        updateManualIncludeFilter();
+        updateManualExcludeFilter();
+    }
+
+    private void updateManualIncludeFilter() {
+        manualFiltersToInclude.clear();
+        String[] manualFilterInclude = manualFilterIncludeText.getText().split("\\|");
+
+        for (String filterToInclude : manualFilterInclude) {
+            if (!filterToInclude.isBlank()) {
+                manualFiltersToInclude.add(filterToInclude);
             }
         }
+    }
 
-        filterLog();
+    private void updateManualExcludeFilter() {
+        manualFiltersToExclude.clear();
+        String[] manualFilterExclude = manualFilterExcludeText.getText().split("\\|");
+
+        for (String filterToExclude : manualFilterExclude) {
+            if (!filterToExclude.isBlank()) {
+                manualFiltersToExclude.add(filterToExclude);
+            }
+        }
     }
 }

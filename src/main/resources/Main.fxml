@@ -21,17 +21,27 @@
                 </Menu>
             </MenuBar>
             <HBox alignment="CENTER" spacing="10.0">
-                <Label alignment="CENTER" contentDisplay="CENTER" prefWidth="100.0" text="Filter: " />
-                <TextArea fx:id="manualFilterText" prefHeight="10.0" HBox.hgrow="ALWAYS"  />
-                <Button prefWidth="150.0" text="Filter now" onAction="#handleManualFilterClick">
-               <HBox.margin>
-                  <Insets right="5.0" />
-               </HBox.margin></Button>
+                <Label alignment="CENTER" contentDisplay="CENTER" prefWidth="100.0" text="Filter in: " />
+                <TextArea fx:id="manualFilterIncludeText" prefHeight="10.0" HBox.hgrow="ALWAYS" />
+                <Button onAction="#handleManualFilterClick" prefWidth="150.0" text="Filter in now">
+                    <HBox.margin>
+                        <Insets right="5.0" />
+                    </HBox.margin>
+                </Button>
+            </HBox>
+            <HBox alignment="CENTER" spacing="10.0">
+                <Label alignment="CENTER" contentDisplay="CENTER" prefWidth="100.0" text="Filter out: " />
+                <TextArea fx:id="manualFilterExcludeText" prefHeight="10.0" HBox.hgrow="ALWAYS" />
+                <Button onAction="#handleManualFilterClick" prefWidth="150.0" text="Filter out now">
+                    <HBox.margin>
+                        <Insets right="5.0" />
+                    </HBox.margin>
+                </Button>
             </HBox>
         </VBox>
    </top>
 
     <center>
-        <ListView fx:id="logFileList" />
+        <ListView fx:id="logFileList" prefWidth="609.0" />
     </center>
 </BorderPane>

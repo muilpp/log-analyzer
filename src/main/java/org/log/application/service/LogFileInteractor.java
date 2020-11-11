@@ -23,11 +23,11 @@ public class LogFileInteractor {
         return logFileOpener.openFile(logFileName);
     }
 
-    public List<String> filterListBy(List<String> originalList, List<String> wordsToFilter) {
-        if (wordsToFilter.isEmpty())
+    public List<String> filterListBy(List<String> originalList, List<String> wordsToInclude, List<String> wordsToExclude) {
+        if (wordsToInclude.isEmpty() && wordsToExclude.isEmpty())
             return originalList;
 
-        return logFileFilter.filterListBy(originalList, wordsToFilter);
+        return logFileFilter.filterListBy(originalList, wordsToInclude, wordsToExclude);
     }
 
     public boolean exportToLog(File file, List<String> logFileList) {

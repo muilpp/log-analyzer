@@ -1,4 +1,4 @@
-veritate,veritate
-geored,updateLastGeored|checkTo|Active threads
-sip,INVITE
-rtp,"received "
+Geored,GeoredConnectivityInteractorImpl.checkServerResponses georedundancy check to |GeoredConnectivityInteractorImpl.startCheckTask:|GeoredConnectivityInteractorImpl.GeoredRunnableTask: task performed in|GeoredConnectivityInteractorImpl.checkServerResponses result=|GeoredConnectivityInteractorImpl.getAvailableServer georedundancy response|GeoredConnectivityInteractorImpl.checkServerStatus georedundancy check to|GeoredConnectivityInteractorImpl.getAvailableServer georedundancy server will be switched to:|GeoredUtils.switchToServer georedundancy from|HttpRequestUtils.getHttpClient: conn|
+Connectivity,onAvailable|onLost|bindProcessToNetwork
+App start,for flavor
+RTCP,Subtype: TB_GRANTED|TB_RELEASE|TB_TAKEN|START_AUDIO|STOP_AUDIO|receivedDataRTC|PPTT_BUTTON_PRESSED|PTT_BUTTON_RELEASE
