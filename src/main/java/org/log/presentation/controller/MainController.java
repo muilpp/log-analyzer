@@ -7,6 +7,8 @@ import javafx.fxml.Initializable;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.input.Clipboard;
+import javafx.scene.input.ClipboardContent;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.stage.FileChooser;
@@ -64,6 +66,22 @@ public class MainController implements Initializable {
                 keyEvent.consume(); // necessary to prevent event handlers for this event
                 handleManualFilterClick(null);
             }
+        });
+
+        logFileList.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
+        logFileList.setOnKeyPressed(keyEvent -> {
+            List<String> logList = logFileList.getSelectionModel().getSelectedItems();
+
+            final ClipboardContent content = new ClipboardContent();
+            StringBuilder stringBuilder = new StringBuilder();
+            for (String log : logList) {
+                System.out.println("Found selected: " + log);
+                stringBuilder.append(log).append("\n");
+            }
+            System.out.println("Added to clipboard: " + stringBuilder.toString());
+            content.putString(stringBuilder.toString());
+            Clipboard.getSystemClipboard().setContent(content);
+
         });
     }
 

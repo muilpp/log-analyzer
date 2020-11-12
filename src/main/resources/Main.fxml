@@ -42,6 +42,6 @@
    </top>
 
     <center>
-        <ListView fx:id="logFileList" prefWidth="609.0" />
+        <ListView fx:id="logFileList" prefWidth="609.0"/>
     </center>
 </BorderPane>
