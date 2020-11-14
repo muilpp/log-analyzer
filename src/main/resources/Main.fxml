@@ -38,10 +38,20 @@
                     </HBox.margin>
                 </Button>
             </HBox>
+            <HBox alignment="CENTER" spacing="10.0">
+                <TextField fx:id="filterMatchesText" alignment="CENTER" disable="true" prefHeight="10.0" prefWidth="700.0" HBox.hgrow="NEVER">
+               <HBox.margin>
+                  <Insets left="5.0" />
+               </HBox.margin></TextField>
+                <CheckBox fx:id="sortLogCheckBox" onAction="#handleSortLogFileClick" prefWidth="150.0" text="Sort by date" />
+                <HBox.margin>
+                    <Insets right="5.0" />
+                </HBox.margin>
+            </HBox>
         </VBox>
    </top>
 
     <center>
-        <ListView fx:id="logFileList" prefWidth="609.0"/>
+        <ListView fx:id="logFileList" prefWidth="609.0" />
     </center>
 </BorderPane>

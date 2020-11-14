@@ -42,6 +42,10 @@ public class MainController implements Initializable {
     public ListView<String> logFileList;
     @FXML
     public TextArea manualFilterIncludeText, manualFilterExcludeText;
+    @FXML
+    public CheckBox sortLogCheckBox;
+    @FXML
+    public TextField filterMatchesText;
 
     private List<String> originalList;
     private final List<String> manualFiltersToInclude = new ArrayList<>();
@@ -134,6 +138,7 @@ public class MainController implements Initializable {
         List<String> filteredList = logFileInteractor.filterListBy(originalList, filtersToInclude, manualFiltersToExclude);
         logFileList.getItems().clear();
         logFileList.getItems().addAll(filteredList);
+        filterMatchesText.setText(logFileList.getItems().size() + " matches found.");
         System.out.println("List size after filtering: " + logFileList.getItems().size());
     }
 
@@ -200,6 +205,19 @@ public class MainController implements Initializable {
     public void handleManualFilterClick(ActionEvent actionEvent) {
         updateManualFilters();
         filterLog();
+    }
+
+    public void handleSortLogFileClick(ActionEvent actionEvent) {
+        if (sortLogCheckBox.isSelected()) {
+            List<String> sortedLogList = new ArrayList<>(logFileList.getItems());
+            System.out.println("Sorted list has " + sortedLogList.size());
+            Collections.sort(sortedLogList);
+            logFileList.getItems().clear();
+            logFileList.getItems().addAll(sortedLogList);
+            System.out.println("Added sorted list to log file: " + logFileList.getItems().size());
+        } else {
+            filterLog();
+        }
     }
 
     private void updateManualFilters() {
