@@ -10,15 +10,13 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 
-public class ConfirmBox {
-
-    private static boolean answer;
+public class AlertBox {
 
     public static boolean display(String title, String text) {
         Stage window = new Stage();
         window.initModality(Modality.APPLICATION_MODAL);
         window.setHeight(150);
-        window.setWidth(300);
+        window.setWidth(500);
         window.setTitle(title);
         window.setAlwaysOnTop(true);
 
@@ -26,15 +24,8 @@ public class ConfirmBox {
         buttonBox.setAlignment(Pos.BOTTOM_CENTER);
         buttonBox.prefHeight(100);
         buttonBox.prefWidth(200);
-        Button yesButton = new Button("Yes");
-        yesButton.setOnAction(actionEvent -> {
-            answer = true;
-            window.close();
-        });
-
-        Button noButton = new Button("No");
-        noButton.setOnAction(actionEvent -> {
-            answer = false;
+        Button confirm = new Button("Ok");
+        confirm.setOnAction(actionEvent -> {
             window.close();
         });
 
@@ -43,12 +34,13 @@ public class ConfirmBox {
         layout.setAlignment(Pos.TOP_CENTER);
         layout.prefHeight(200);
         layout.prefWidth(300);
-        buttonBox.getChildren().addAll(yesButton, noButton);
+        buttonBox.getChildren().add(confirm);
         Label confirmLabel = new Label(text);
         layout.getChildren().addAll(confirmLabel, buttonBox);
 
         window.setScene(new Scene(layout));
-        window.showAndWait();
-        return answer;
+        window.show();
+
+        return true;
     }
 }

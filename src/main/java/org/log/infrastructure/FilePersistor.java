@@ -6,6 +6,7 @@ import org.apache.commons.csv.CSVPrinter;
 import org.apache.commons.csv.CSVRecord;
 import org.log.domain.entities.Filter;
 import org.log.domain.ports.filter.FilterRepository;
+import org.log.presentation.AlertBox;
 
 import java.io.BufferedWriter;
 import java.io.FileWriter;
@@ -47,7 +48,7 @@ public class FilePersistor implements FilterRepository {
         System.out.println("Create filter with name: " + filterName);
         if (filterExists(filterName)) {
             System.out.println("Filter already exists, can't create a new one with the same name");
-            //TODO Show popup to inform user filter won't be created
+            AlertBox.display("Warning!","Can't create a new filter with this name, it already exists");
             return false;
         }
 
