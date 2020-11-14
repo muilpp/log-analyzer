@@ -44,8 +44,13 @@ public class FilePersistor implements FilterRepository {
 
     @Override
     public boolean create(String filterName, String filterData) {
-        //TODO Check filtername doesn't already exist!
         System.out.println("Create filter with name: " + filterName);
+        if (filterExists(filterName)) {
+            System.out.println("Filter already exists, can't create a new one with the same name");
+            //TODO Show popup to inform user filter won't be created
+            return false;
+        }
+
         try (BufferedWriter writer = Files.newBufferedWriter(Paths.get(FILTERS_FILENAME), APPEND, CREATE);
              CSVPrinter csvPrinter = new CSVPrinter(writer, CSVFormat.DEFAULT)) {
 
@@ -58,6 +63,18 @@ public class FilePersistor implements FilterRepository {
         }
 
         return true;
+    }
+
+    private boolean filterExists(String filterName) {
+        List<Filter> filterList = findAll();
+
+        for (Filter filter : filterList) {
+            if (filter.getFilterName().equalsIgnoreCase(filterName)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     @Override
