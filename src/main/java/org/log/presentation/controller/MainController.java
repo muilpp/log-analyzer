@@ -95,7 +95,7 @@ public class MainController implements Initializable {
         filtersMenu.getItems().removeIf(item -> (item instanceof CheckMenuItem));
         selectedFilters.clear();
         FilterReader filterReader = new FilterReader(new FilePersistor());
-        List<Filter> filterList = filterReader.read();
+        List<Filter> filterList = filterReader.readAllFilters();
 
         System.out.println("Filters found: " + filterList.size());
 
@@ -111,7 +111,7 @@ public class MainController implements Initializable {
 
     public void handleFilterMenuClick(final CheckMenuItem menuItem) {
         FilterReader filterReader = new FilterReader(new FilePersistor());
-        List<Filter> filterList = filterReader.read();
+        List<Filter> filterList = filterReader.readAllFilters();
 
         Optional<Filter> foundFilter = filterList.stream().filter(filter -> filter.getFilterName().equalsIgnoreCase(menuItem.getText())).findFirst();
 
@@ -210,11 +210,10 @@ public class MainController implements Initializable {
     public void handleSortLogFileClick(ActionEvent actionEvent) {
         if (sortLogCheckBox.isSelected()) {
             List<String> sortedLogList = new ArrayList<>(logFileList.getItems());
-            System.out.println("Sorted list has " + sortedLogList.size());
             Collections.sort(sortedLogList);
+            sortedLogList.removeAll(Arrays.asList("", null));
             logFileList.getItems().clear();
             logFileList.getItems().addAll(sortedLogList);
-            System.out.println("Added sorted list to log file: " + logFileList.getItems().size());
         } else {
             filterLog();
         }

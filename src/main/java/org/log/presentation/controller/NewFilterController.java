@@ -7,9 +7,12 @@ import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
 import org.log.application.usecases.FilterCreator;
+import org.log.application.usecases.FilterReader;
+import org.log.domain.entities.Filter;
 import org.log.infrastructure.FilePersistor;
 
 import java.net.URL;
+import java.util.List;
 import java.util.ResourceBundle;
 
 public class NewFilterController implements Initializable {
@@ -29,10 +32,29 @@ public class NewFilterController implements Initializable {
             stage.close();
         }
 
-        FilterCreator filterCreator = new FilterCreator(new FilePersistor());
-        filterCreator.create(filterNameText.getText(), filterContentText.getText());
+        FilterReader filterReader = new FilterReader(new FilePersistor());
+        List<Filter> filterList = filterReader.readAllFilters();
 
-        stage.close();
+        boolean filterAlreadyExists = false;
+        for (Filter filter : filterList) {
+            if (filter.getFilterName().equalsIgnoreCase(filterNameText.getText().trim())) {
+                filterAlreadyExists = true;
+                break;
+            }
+        }
+
+        if (filterAlreadyExists) {
+            filterNameText.setStyle("-fx-border-color: #FF0000");
+            String filterName = filterNameText.getText();
+            filterNameText.setText("FILTER NAME: " + filterName + " ALREADY EXISTS, CHANGE IT!");
+            System.out.println("Filtre ja existeix, poso fondo vermell!");
+        } else {
+            FilterCreator filterCreator = new FilterCreator(new FilePersistor());
+            filterCreator.create(filterNameText.getText(), filterContentText.getText());
+            System.out.println("Tot ok, creo filtre");
+
+            stage.close();
+        }
     }
 
     public void handleCancelButtonClick(ActionEvent actionEvent) {

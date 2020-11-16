@@ -12,7 +12,7 @@ public class FilterReader {
         this.filterRepository = filterRepository;
     }
 
-    public List<Filter> read() {
+    public List<Filter> readAllFilters() {
         return filterRepository.findAll();
     }
 }

@@ -39,11 +39,12 @@ public class EditFilterController implements Initializable{
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
         populateFilters();
+        saveFilterButton.setDisable(true);
     }
 
     private void populateFilters() {
         FilterReader filterReader = new FilterReader(new FilePersistor());
-        List<Filter> filterList = filterReader.read();
+        List<Filter> filterList = filterReader.readAllFilters();
         filterListView.getItems().clear();
 
         filterList.forEach(filter -> {
@@ -60,6 +61,7 @@ public class EditFilterController implements Initializable{
                     filterContentText.setText(filter.getFilterData());
                 }
             });
+            saveFilterButton.setDisable(false);
         });
     }
 

@@ -6,7 +6,6 @@ import org.apache.commons.csv.CSVPrinter;
 import org.apache.commons.csv.CSVRecord;
 import org.log.domain.entities.Filter;
 import org.log.domain.ports.filter.FilterRepository;
-import org.log.presentation.AlertBox;
 
 import java.io.BufferedWriter;
 import java.io.FileWriter;
@@ -46,11 +45,6 @@ public class FilePersistor implements FilterRepository {
     @Override
     public boolean create(String filterName, String filterData) {
         System.out.println("Create filter with name: " + filterName);
-        if (filterExists(filterName)) {
-            System.out.println("Filter already exists, can't create a new one with the same name");
-            AlertBox.display("Warning!","Can't create a new filter with this name, it already exists");
-            return false;
-        }
 
         try (BufferedWriter writer = Files.newBufferedWriter(Paths.get(FILTERS_FILENAME), APPEND, CREATE);
              CSVPrinter csvPrinter = new CSVPrinter(writer, CSVFormat.DEFAULT)) {
@@ -64,18 +58,6 @@ public class FilePersistor implements FilterRepository {
         }
 
         return true;
-    }
-
-    private boolean filterExists(String filterName) {
-        List<Filter> filterList = findAll();
-
-        for (Filter filter : filterList) {
-            if (filter.getFilterName().equalsIgnoreCase(filterName)) {
-                return true;
-            }
-        }
-
-        return false;
     }
 
     @Override
