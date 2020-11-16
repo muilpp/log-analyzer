@@ -7,10 +7,7 @@ import javafx.fxml.Initializable;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
-import javafx.scene.input.Clipboard;
-import javafx.scene.input.ClipboardContent;
-import javafx.scene.input.KeyCode;
-import javafx.scene.input.KeyEvent;
+import javafx.scene.input.*;
 import javafx.stage.FileChooser;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
@@ -39,7 +36,7 @@ public class MainController implements Initializable {
     @FXML
     public MenuItem editFilters;
     @FXML
-    public ListView<String> logFileList;
+    public ListView<String> sortedLogFileList, originalLogFileList;
     @FXML
     public TextArea manualFilterIncludeText, manualFilterExcludeText;
     @FXML
@@ -72,9 +69,9 @@ public class MainController implements Initializable {
             }
         });
 
-        logFileList.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
-        logFileList.setOnKeyPressed(keyEvent -> {
-            List<String> logList = logFileList.getSelectionModel().getSelectedItems();
+        sortedLogFileList.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
+        sortedLogFileList.setOnKeyPressed(keyEvent -> {
+            List<String> logList = sortedLogFileList.getSelectionModel().getSelectedItems();
 
             final ClipboardContent content = new ClipboardContent();
             StringBuilder stringBuilder = new StringBuilder();
@@ -136,10 +133,10 @@ public class MainController implements Initializable {
         filtersToInclude.addAll(manualFiltersToInclude);
 
         List<String> filteredList = logFileInteractor.filterListBy(originalList, filtersToInclude, manualFiltersToExclude);
-        logFileList.getItems().clear();
-        logFileList.getItems().addAll(filteredList);
-        filterMatchesText.setText(logFileList.getItems().size() + " matches found.");
-        System.out.println("List size after filtering: " + logFileList.getItems().size());
+        sortedLogFileList.getItems().clear();
+        sortedLogFileList.getItems().addAll(filteredList);
+        filterMatchesText.setText(sortedLogFileList.getItems().size() + " matches found.");
+        System.out.println("List size after filtering: " + sortedLogFileList.getItems().size());
     }
 
     public void handleOpenFileMenuClick() {
@@ -160,8 +157,10 @@ public class MainController implements Initializable {
     private void openLogFile(String logFilePath) {
         originalList = logFileInteractor.loadLogFile(logFilePath);
         System.out.println("List size after loading: " + originalList.size());
-        logFileList.getItems().clear();
-        logFileList.getItems().addAll(originalList);
+        sortedLogFileList.getItems().clear();
+        sortedLogFileList.getItems().addAll(originalList);
+        originalLogFileList.getItems().clear();
+        originalLogFileList.getItems().addAll(originalList);
     }
 
     public void handleExportFileMenuClick(ActionEvent actionEvent) {
@@ -171,7 +170,7 @@ public class MainController implements Initializable {
         File file = fileChooser.showSaveDialog(menuBar.getScene().getWindow());
 
         if (file != null) {
-            logFileInteractor.exportToLog(file, logFileList.getItems());
+            logFileInteractor.exportToLog(file, sortedLogFileList.getItems());
         }
     }
 
@@ -209,11 +208,11 @@ public class MainController implements Initializable {
 
     public void handleSortLogFileClick(ActionEvent actionEvent) {
         if (sortLogCheckBox.isSelected()) {
-            List<String> sortedLogList = new ArrayList<>(logFileList.getItems());
+            List<String> sortedLogList = new ArrayList<>(sortedLogFileList.getItems());
             Collections.sort(sortedLogList);
             sortedLogList.removeAll(Arrays.asList("", null));
-            logFileList.getItems().clear();
-            logFileList.getItems().addAll(sortedLogList);
+            sortedLogFileList.getItems().clear();
+            sortedLogFileList.getItems().addAll(sortedLogList);
         } else {
             filterLog();
         }
@@ -244,5 +243,12 @@ public class MainController implements Initializable {
                 manualFiltersToExclude.add(filterToExclude);
             }
         }
+    }
+
+    public void handleMouseSortedListClick(MouseEvent mouseEvent) {
+        String selectedSortedListElement = sortedLogFileList.getSelectionModel().getSelectedItem();
+        originalLogFileList.getSelectionModel().select(selectedSortedListElement);
+        //originalLogFileList.getFocusModel().focus(selectedSortedListElement);
+        originalLogFileList.scrollTo(selectedSortedListElement);
     }
 }

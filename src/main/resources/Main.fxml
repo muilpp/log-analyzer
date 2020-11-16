@@ -50,8 +50,10 @@
             </HBox>
         </VBox>
    </top>
-
-    <center>
-        <ListView fx:id="logFileList" prefWidth="609.0" />
-    </center>
+   <center>
+       <SplitPane dividerPositions="0.5, 0.5" orientation="VERTICAL" prefHeight="200.0" prefWidth="160.0" BorderPane.alignment="CENTER">
+           <ListView fx:id="sortedLogFileList" onMouseClicked="#handleMouseSortedListClick" prefWidth="609.0"/>
+           <ListView fx:id="originalLogFileList" prefWidth="609.0"/>
+       </SplitPane>
+   </center>
 </BorderPane>
