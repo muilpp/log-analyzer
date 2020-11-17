@@ -43,6 +43,8 @@ public class MainController implements Initializable {
     public CheckBox sortLogCheckBox;
     @FXML
     public TextField filterMatchesText;
+    @FXML
+    public TabPane logTabPane;
 
     private List<String> originalList;
     private final List<String> manualFiltersToInclude = new ArrayList<>();
@@ -82,7 +84,6 @@ public class MainController implements Initializable {
             System.out.println("Added to clipboard: " + stringBuilder.toString());
             content.putString(stringBuilder.toString());
             Clipboard.getSystemClipboard().setContent(content);
-
         });
     }
 
@@ -149,6 +150,9 @@ public class MainController implements Initializable {
             Stage stage = (Stage) manualFilterIncludeText.getScene().getWindow();
             stage.setTitle(logFile.getName());
             openLogFile(logFile.getPath());
+
+            Tab tabPane = new Tab(logFile.getName());
+            logTabPane.getTabs().add(tabPane);
         } else {
             System.out.println("Could not open the fucking file!");
         }
