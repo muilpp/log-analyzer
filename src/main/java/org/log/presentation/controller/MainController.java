@@ -8,6 +8,7 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.input.*;
+import javafx.scene.layout.VBox;
 import javafx.stage.FileChooser;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
@@ -45,6 +46,8 @@ public class MainController implements Initializable {
     public TextField filterMatchesText;
     @FXML
     public TabPane logTabPane;
+    @FXML
+    public VBox mainVerticalBox;
 
     private List<String> originalList;
     private final List<String> manualFiltersToInclude = new ArrayList<>();
@@ -56,35 +59,6 @@ public class MainController implements Initializable {
     public void initialize(URL url, ResourceBundle resourceBundle) {
         logFileInteractor = new LogFileInteractor(new LogFileFilterImpl(), new LogFileOpenerImpl(), new LogFileExporterImpl());
         loadFilterMenu();
-
-        manualFilterIncludeText.addEventFilter(KeyEvent.KEY_PRESSED, keyEvent -> {
-            if (keyEvent.getCode().equals(KeyCode.ENTER)) {
-                keyEvent.consume(); // necessary to prevent event handlers for this event
-                handleManualFilterClick(null);
-            }
-        });
-
-        manualFilterExcludeText.addEventFilter(KeyEvent.KEY_PRESSED, keyEvent -> {
-            if (keyEvent.getCode().equals(KeyCode.ENTER)) {
-                keyEvent.consume(); // necessary to prevent event handlers for this event
-                handleManualFilterClick(null);
-            }
-        });
-
-        sortedLogFileList.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
-        sortedLogFileList.setOnKeyPressed(keyEvent -> {
-            List<String> logList = sortedLogFileList.getSelectionModel().getSelectedItems();
-
-            final ClipboardContent content = new ClipboardContent();
-            StringBuilder stringBuilder = new StringBuilder();
-            for (String log : logList) {
-                System.out.println("Found selected: " + log);
-                stringBuilder.append(log).append("\n");
-            }
-            System.out.println("Added to clipboard: " + stringBuilder.toString());
-            content.putString(stringBuilder.toString());
-            Clipboard.getSystemClipboard().setContent(content);
-        });
     }
 
     public void loadFilterMenu() {
@@ -147,24 +121,66 @@ public class MainController implements Initializable {
 
         if (logFile != null) {
             System.out.println("Log file selected: " + logFile.getAbsolutePath());
-            Stage stage = (Stage) manualFilterIncludeText.getScene().getWindow();
+            Stage stage = (Stage) menuBar.getScene().getWindow();
             stage.setTitle(logFile.getName());
             openLogFile(logFile.getPath());
 
-            Tab tabPane = new Tab(logFile.getName());
-            logTabPane.getTabs().add(tabPane);
+            //Tab tabPane = new Tab(logFile.getName());
+            //logTabPane.getTabs().add(tabPane);
         } else {
             System.out.println("Could not open the fucking file!");
         }
     }
 
     private void openLogFile(String logFilePath) {
+        FXMLLoader loader = new FXMLLoader();
+        loader.setLocation(getClass().getResource("/TabFilter.fxml"));
+
+        try {
+            TabPane newLoadedPane =  FXMLLoader.load(getClass().getResource("/TabFilter.fxml"));
+            mainVerticalBox.getChildren().add(newLoadedPane);
+            initializeTabElements();
+        } catch (IOException e) {
+            System.out.println("Could load file to filter: " + e);
+        }
+
         originalList = logFileInteractor.loadLogFile(logFilePath);
         System.out.println("List size after loading: " + originalList.size());
         sortedLogFileList.getItems().clear();
         sortedLogFileList.getItems().addAll(originalList);
         originalLogFileList.getItems().clear();
         originalLogFileList.getItems().addAll(originalList);
+    }
+
+    private void initializeTabElements() {
+        manualFilterIncludeText.addEventFilter(KeyEvent.KEY_PRESSED, keyEvent -> {
+            if (keyEvent.getCode().equals(KeyCode.ENTER)) {
+                keyEvent.consume(); // necessary to prevent event handlers for this event
+                handleManualFilterClick(null);
+            }
+        });
+
+        manualFilterExcludeText.addEventFilter(KeyEvent.KEY_PRESSED, keyEvent -> {
+            if (keyEvent.getCode().equals(KeyCode.ENTER)) {
+                keyEvent.consume(); // necessary to prevent event handlers for this event
+                handleManualFilterClick(null);
+            }
+        });
+
+        sortedLogFileList.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
+        sortedLogFileList.setOnKeyPressed(keyEvent -> {
+            List<String> logList = sortedLogFileList.getSelectionModel().getSelectedItems();
+
+            final ClipboardContent content = new ClipboardContent();
+            StringBuilder stringBuilder = new StringBuilder();
+            for (String log : logList) {
+                System.out.println("Found selected: " + log);
+                stringBuilder.append(log).append("\n");
+            }
+            System.out.println("Added to clipboard: " + stringBuilder.toString());
+            content.putString(stringBuilder.toString());
+            Clipboard.getSystemClipboard().setContent(content);
+        });
     }
 
     public void handleExportFileMenuClick(ActionEvent actionEvent) {
