@@ -16,15 +16,15 @@ public class App extends Application {
     @Override
     public void start(Stage stage) throws IOException {
         window = stage;
-        window.getIcons().add(new Image(getClass().getResourceAsStream("/rocket.png")));
 
         FXMLLoader loader = new FXMLLoader();
         loader.setLocation(getClass().getResource("/Main.fxml"));
         Parent root = loader.load();
-
-        window.setTitle("Log Analyzer");
         Scene scene = new Scene(root);
         //scene.getRoot().setStyle("-fx-base:black");
+
+        window.getIcons().add(new Image(getClass().getResourceAsStream("/rocket.png")));
+        window.setTitle("Log Analyzer");
         window.setScene(scene);
         window.setMaximized(true);
         window.show();
