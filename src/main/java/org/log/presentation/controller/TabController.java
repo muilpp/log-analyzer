@@ -9,7 +9,6 @@ import org.log.application.service.LogFileInteractor;
 import org.log.application.usecases.LogFileExporterImpl;
 import org.log.application.usecases.LogFileFilterImpl;
 import org.log.application.usecases.LogFileOpenerImpl;
-import org.log.domain.entities.Filter;
 
 import java.net.URL;
 import java.util.*;
@@ -29,13 +28,11 @@ public class TabController implements Initializable {
 
     private LogFileInteractor logFileInteractor;
     private List<String> originalList = new ArrayList<>();
-    private List<String> selectedFilters = new ArrayList<>();
-    private List<Filter> selectedMenuFilters = new ArrayList<>();
+    private List<String> selectedMenuFilters = new ArrayList<>();
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
         logFileInteractor = new LogFileInteractor(new LogFileFilterImpl(), new LogFileOpenerImpl(), new LogFileExporterImpl());
-        selectedFilters.clear();
         selectedMenuFilters.clear();
         initializeTabElements();
     }
@@ -45,7 +42,6 @@ public class TabController implements Initializable {
 
         originalLogFileList.getItems().addAll(originalList);
         sortedLogFileList.getItems().addAll(originalList);
-        //this.selectedMenuFilters = new ArrayList<>(selectedMenuFilters);
     }
 
     public void handleManualFilterClick(ActionEvent actionEvent) {
@@ -54,7 +50,7 @@ public class TabController implements Initializable {
     }
 
     private void filterLog() {
-        final List<String> filtersToInclude = new ArrayList<>(selectedFilters);
+        final List<String> filtersToInclude = new ArrayList<>(selectedMenuFilters);
         filtersToInclude.addAll(manualFiltersToInclude);
 
         List<String> filteredList = logFileInteractor.filterListBy(originalList, filtersToInclude, manualFiltersToExclude);
