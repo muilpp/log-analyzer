@@ -7,7 +7,6 @@ import javafx.fxml.Initializable;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
-import javafx.scene.input.*;
 import javafx.scene.layout.VBox;
 import javafx.stage.FileChooser;
 import javafx.stage.Modality;
@@ -24,7 +23,10 @@ import org.log.infrastructure.FilePersistor;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
-import java.util.*;
+import java.util.List;
+import java.util.Optional;
+import java.util.ResourceBundle;
+import java.util.stream.Collectors;
 
 public class MainController implements Initializable {
 
@@ -37,35 +39,27 @@ public class MainController implements Initializable {
     @FXML
     public MenuItem editFilters;
     @FXML
-    public ListView<String> sortedLogFileList, originalLogFileList;
-    @FXML
-    public TextArea manualFilterIncludeText, manualFilterExcludeText;
-    @FXML
-    public CheckBox sortLogCheckBox;
-    @FXML
-    public TextField filterMatchesText;
-    @FXML
     public TabPane logTabPane;
     @FXML
     public VBox mainVerticalBox;
 
-    private List<String> originalList;
-    private final List<String> manualFiltersToInclude = new ArrayList<>();
-    private final List<String> manualFiltersToExclude = new ArrayList<>();
-    private final List<String> selectedFilters = new ArrayList<>();
     private LogFileInteractor logFileInteractor;
+    private Tab currentTab;
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
         logFileInteractor = new LogFileInteractor(new LogFileFilterImpl(), new LogFileOpenerImpl(), new LogFileExporterImpl());
         loadFilterMenu();
+
+        logTabPane.getSelectionModel().selectedItemProperty().addListener(
+                (observableValue, tab, t1) -> setCurrentTab(t1)
+        );
     }
 
     public void loadFilterMenu() {
         //This is done to reload elements after coming back from the EditFilter menu, would be better to have listeners instead of this
         //https://stackoverflow.com/questions/29639881/javafx-how-to-use-a-method-in-a-controller-from-another-controller
         filtersMenu.getItems().removeIf(item -> (item instanceof CheckMenuItem));
-        selectedFilters.clear();
         FilterReader filterReader = new FilterReader(new FilePersistor());
         List<Filter> filterList = filterReader.readAllFilters();
 
@@ -73,9 +67,7 @@ public class MainController implements Initializable {
 
         filterList.forEach(filter -> {
             final CheckMenuItem checkMenuItem = new CheckMenuItem(filter.getFilterName());
-            checkMenuItem.setOnAction(e -> {
-                handleFilterMenuClick(checkMenuItem);
-            });
+            checkMenuItem.setOnAction(e -> handleFilterMenuClick(checkMenuItem));
             System.out.println("Filter found: " + filter.getFilterName());
             filtersMenu.getItems().add(checkMenuItem);
         });
@@ -93,25 +85,16 @@ public class MainController implements Initializable {
             String[] dataSplit = filterData.split("\\|");
             if (menuItem.isSelected()) {
                 System.out.println("Adding filter: " + filterData);
-                selectedFilters.addAll(Arrays.asList(dataSplit));
+                //TODO Apply filter!
+                //selectedFilters.addAll(Arrays.asList(dataSplit));
             } else {
                 System.out.println("Removing filter: " + filterData);
-                selectedFilters.removeAll(Arrays.asList(dataSplit));
+                //TODO Apply filter!
+                //selectedFilters.removeAll(Arrays.asList(dataSplit));
             }
         } else System.out.println("No filter found");
 
-        filterLog();
-    }
-
-    private void filterLog() {
-        final List<String> filtersToInclude = new ArrayList<>(selectedFilters);
-        filtersToInclude.addAll(manualFiltersToInclude);
-
-        List<String> filteredList = logFileInteractor.filterListBy(originalList, filtersToInclude, manualFiltersToExclude);
-        sortedLogFileList.getItems().clear();
-        sortedLogFileList.getItems().addAll(filteredList);
-        filterMatchesText.setText(sortedLogFileList.getItems().size() + " matches found.");
-        System.out.println("List size after filtering: " + sortedLogFileList.getItems().size());
+        //TODO Filter current log after applying filters!
     }
 
     public void handleOpenFileMenuClick() {
@@ -123,7 +106,7 @@ public class MainController implements Initializable {
             System.out.println("Log file selected: " + logFile.getAbsolutePath());
             Stage stage = (Stage) menuBar.getScene().getWindow();
             stage.setTitle(logFile.getName());
-            openLogFile(logFile.getPath());
+            openLogFile(logFile);
 
             //Tab tabPane = new Tab(logFile.getName());
             //logTabPane.getTabs().add(tabPane);
@@ -132,55 +115,22 @@ public class MainController implements Initializable {
         }
     }
 
-    private void openLogFile(String logFilePath) {
-        FXMLLoader loader = new FXMLLoader();
-        loader.setLocation(getClass().getResource("/TabFilter.fxml"));
-
+    private void openLogFile(File logFile) {
         try {
-            TabPane newLoadedPane =  FXMLLoader.load(getClass().getResource("/TabFilter.fxml"));
-            mainVerticalBox.getChildren().add(newLoadedPane);
-            initializeTabElements();
+            Tab newTab = new Tab(logFile.getName());
+            FXMLLoader loader = new FXMLLoader(this.getClass().getResource("/TabFilter.fxml"));
+            newTab.setContent(loader.load());
+            logTabPane.getTabs().add(newTab);
+            TabController tabController = loader.getController();
+            tabController.setData(logFileInteractor.loadLogFile(logFile.getPath()));
+            logTabPane.getSelectionModel().select(newTab);
         } catch (IOException e) {
-            System.out.println("Could load file to filter: " + e);
+            System.out.println("Could not load file to filter: " + e);
         }
-
-        originalList = logFileInteractor.loadLogFile(logFilePath);
-        System.out.println("List size after loading: " + originalList.size());
-        sortedLogFileList.getItems().clear();
-        sortedLogFileList.getItems().addAll(originalList);
-        originalLogFileList.getItems().clear();
-        originalLogFileList.getItems().addAll(originalList);
     }
 
-    private void initializeTabElements() {
-        manualFilterIncludeText.addEventFilter(KeyEvent.KEY_PRESSED, keyEvent -> {
-            if (keyEvent.getCode().equals(KeyCode.ENTER)) {
-                keyEvent.consume(); // necessary to prevent event handlers for this event
-                handleManualFilterClick(null);
-            }
-        });
-
-        manualFilterExcludeText.addEventFilter(KeyEvent.KEY_PRESSED, keyEvent -> {
-            if (keyEvent.getCode().equals(KeyCode.ENTER)) {
-                keyEvent.consume(); // necessary to prevent event handlers for this event
-                handleManualFilterClick(null);
-            }
-        });
-
-        sortedLogFileList.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
-        sortedLogFileList.setOnKeyPressed(keyEvent -> {
-            List<String> logList = sortedLogFileList.getSelectionModel().getSelectedItems();
-
-            final ClipboardContent content = new ClipboardContent();
-            StringBuilder stringBuilder = new StringBuilder();
-            for (String log : logList) {
-                System.out.println("Found selected: " + log);
-                stringBuilder.append(log).append("\n");
-            }
-            System.out.println("Added to clipboard: " + stringBuilder.toString());
-            content.putString(stringBuilder.toString());
-            Clipboard.getSystemClipboard().setContent(content);
-        });
+    private List<MenuItem> getSelectedMenuFilters() {
+        return filtersMenu.getItems().stream().filter(f -> ((CheckMenuItem)f).isSelected()).collect(Collectors.toList());
     }
 
     public void handleExportFileMenuClick(ActionEvent actionEvent) {
@@ -190,7 +140,8 @@ public class MainController implements Initializable {
         File file = fileChooser.showSaveDialog(menuBar.getScene().getWindow());
 
         if (file != null) {
-            logFileInteractor.exportToLog(file, sortedLogFileList.getItems());
+            ListView<String> sortedListView = (ListView<String>)currentTab.getContent().getScene().lookup("#sortedLogFileList");
+            logFileInteractor.exportToLog(file, sortedListView.getItems());
         }
     }
 
@@ -221,54 +172,7 @@ public class MainController implements Initializable {
         }
     }
 
-    public void handleManualFilterClick(ActionEvent actionEvent) {
-        updateManualFilters();
-        filterLog();
-    }
-
-    public void handleSortLogFileClick(ActionEvent actionEvent) {
-        if (sortLogCheckBox.isSelected()) {
-            List<String> sortedLogList = new ArrayList<>(sortedLogFileList.getItems());
-            Collections.sort(sortedLogList);
-            sortedLogList.removeAll(Arrays.asList("", null));
-            sortedLogFileList.getItems().clear();
-            sortedLogFileList.getItems().addAll(sortedLogList);
-        } else {
-            filterLog();
-        }
-    }
-
-    private void updateManualFilters() {
-        updateManualIncludeFilter();
-        updateManualExcludeFilter();
-    }
-
-    private void updateManualIncludeFilter() {
-        manualFiltersToInclude.clear();
-        String[] manualFilterInclude = manualFilterIncludeText.getText().split("\\|");
-
-        for (String filterToInclude : manualFilterInclude) {
-            if (!filterToInclude.isBlank()) {
-                manualFiltersToInclude.add(filterToInclude);
-            }
-        }
-    }
-
-    private void updateManualExcludeFilter() {
-        manualFiltersToExclude.clear();
-        String[] manualFilterExclude = manualFilterExcludeText.getText().split("\\|");
-
-        for (String filterToExclude : manualFilterExclude) {
-            if (!filterToExclude.isBlank()) {
-                manualFiltersToExclude.add(filterToExclude);
-            }
-        }
-    }
-
-    public void handleMouseSortedListClick(MouseEvent mouseEvent) {
-        String selectedSortedListElement = sortedLogFileList.getSelectionModel().getSelectedItem();
-        originalLogFileList.getSelectionModel().select(selectedSortedListElement);
-        //originalLogFileList.getFocusModel().focus(selectedSortedListElement);
-        originalLogFileList.scrollTo(selectedSortedListElement);
+    public void setCurrentTab(Tab currentTab) {
+        this.currentTab = currentTab;
     }
 }

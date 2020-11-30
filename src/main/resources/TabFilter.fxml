@@ -4,10 +4,8 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<TabPane xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml" fx:id="logTabPane" prefHeight="200.0"
-         prefWidth="200.0" tabClosingPolicy="ALL_TABS" VBox.vgrow="ALWAYS" fx:controller="org.log.presentation.controller.MainController">
-    <Tab text="">
-        <BorderPane>
+        <BorderPane xmlns:fx="http://javafx.com/fxml"
+                    fx:controller="org.log.presentation.controller.TabController">
             <top>
                 <VBox BorderPane.alignment="CENTER">
                     <HBox alignment="CENTER" spacing="10.0">
@@ -47,5 +45,3 @@
                 </SplitPane>
             </center>
         </BorderPane>
-    </Tab>
-</TabPane>

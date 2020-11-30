@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.geometry.*?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
@@ -17,6 +16,6 @@
             <SeparatorMenuItem />
         </Menu>
     </MenuBar>
-
-
+   <TabPane fx:id="logTabPane" prefHeight="200.0" prefWidth="200.0" tabClosingPolicy="ALL_TABS" VBox.vgrow="ALWAYS">
+   </TabPane>
 </VBox>
