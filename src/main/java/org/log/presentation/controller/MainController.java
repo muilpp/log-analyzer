@@ -107,11 +107,8 @@ public class MainController implements Initializable {
             Stage stage = (Stage) menuBar.getScene().getWindow();
             stage.setTitle(logFile.getName());
             openLogFile(logFile);
-
-            //Tab tabPane = new Tab(logFile.getName());
-            //logTabPane.getTabs().add(tabPane);
         } else {
-            System.out.println("Could not open the fucking file!");
+            System.out.println("Could not open the file!");
         }
     }
 
@@ -151,9 +148,6 @@ public class MainController implements Initializable {
 
     public void handleOnEditFiltersClick(ActionEvent actionEvent) {
         try {
-            //URL url = Paths.get("./src/main/resources/EditFilters.fxml").toUri().toURL();
-            //Parent editScene = FXMLLoader.load(url);
-
             FXMLLoader loader = new FXMLLoader();
             loader.setLocation(getClass().getResource("/EditFilters.fxml"));
             Parent editScene = loader.load();
