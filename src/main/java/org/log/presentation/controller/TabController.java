@@ -1,14 +1,23 @@
 package org.log.presentation.controller;
 
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.scene.control.*;
 import javafx.scene.input.*;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
 import org.log.application.service.LogFileInteractor;
+import org.log.application.usecases.FilterReader;
 import org.log.application.usecases.LogFileExporterImpl;
 import org.log.application.usecases.LogFileFilterImpl;
 import org.log.application.usecases.LogFileOpenerImpl;
+import org.log.infrastructure.FilePersistor;
 
 import java.net.URL;
 import java.util.*;
@@ -22,13 +31,17 @@ public class TabController implements Initializable {
     public TextField filterMatchesText;
     @FXML
     public ListView<String> sortedLogFileList, originalLogFileList;
+    @FXML
+    public HBox filterCheckBoxes;
 
     private final List<String> manualFiltersToInclude = new ArrayList<>();
     private final List<String> manualFiltersToExclude = new ArrayList<>();
 
     private LogFileInteractor logFileInteractor;
     private List<String> originalList = new ArrayList<>();
-    private List<String> selectedMenuFilters = new ArrayList<>();
+    private final List<String> selectedMenuFilters = new ArrayList<>();
+    private final KeyCombination keyCombinationShiftC = new KeyCodeCombination(KeyCode.C, KeyCombination.CONTROL_DOWN);
+    private final FilterReader filterReader = new FilterReader(new FilePersistor());
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
@@ -80,19 +93,56 @@ public class TabController implements Initializable {
         });
 
         sortedLogFileList.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
-        sortedLogFileList.setOnKeyPressed(keyEvent -> {
-            List<String> logList = sortedLogFileList.getSelectionModel().getSelectedItems();
+        sortedLogFileList.setOnKeyPressed(copyKeyEventHandler(sortedLogFileList));
+        originalLogFileList.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
+        originalLogFileList.setOnKeyPressed(copyKeyEventHandler(originalLogFileList));
 
-            final ClipboardContent content = new ClipboardContent();
-            StringBuilder stringBuilder = new StringBuilder();
-            for (String log : logList) {
-                System.out.println("Found selected: " + log);
-                stringBuilder.append(log).append("\n");
-            }
-            System.out.println("Added to clipboard: " + stringBuilder.toString());
-            content.putString(stringBuilder.toString());
-            Clipboard.getSystemClipboard().setContent(content);
+        loadCheckBoxFilters();
+    }
+
+    public void loadCheckBoxFilters() {
+        filterReader.readAllFilters().forEach(f -> {
+            CheckBox filterCheckBox = new CheckBox(f.getFilterName());
+            filterCheckBox.selectedProperty().addListener(new ChangeListener<Boolean>() {
+                @Override
+                public void changed(ObservableValue<? extends Boolean> observableValue, Boolean aBoolean, Boolean isSelected) {
+                    String[] dataSplit = f.getFilterData().split("\\|");
+                    if (isSelected) {
+                        System.out.println("Adding filter: " + f.getFilterData());
+                        selectedMenuFilters.addAll(Arrays.asList(dataSplit));
+                    } else {
+                        System.out.println("Removing filter: " + f.getFilterData());
+                        selectedMenuFilters.removeAll(Arrays.asList(dataSplit));
+                    }
+                    filterLog();
+                }
+            });
+
+            VBox vBox = new VBox(filterCheckBox);
+            vBox.setAlignment(Pos.CENTER_LEFT);
+            vBox.setSpacing(20);
+            vBox.setPadding(new Insets(0, 15, 0, 0));
+            filterCheckBoxes.getChildren().add(0, vBox);
         });
+    }
+
+    private EventHandler<? super KeyEvent> copyKeyEventHandler(final ListView<String> logFileList) {
+        return event -> {
+            if (keyCombinationShiftC.match(event)) {
+                List<String> logList = logFileList.getSelectionModel().getSelectedItems();
+
+                final ClipboardContent content = new ClipboardContent();
+                StringBuilder stringBuilder = new StringBuilder();
+                for (String log : logList) {
+                    System.out.println("Found selected: " + log);
+                    stringBuilder.append(log).append("\n");
+                }
+                stringBuilder = stringBuilder.replace(stringBuilder.lastIndexOf("\n"), stringBuilder.lastIndexOf("\n")+2, "");
+                System.out.println("Added to clipboard: " + stringBuilder.toString());
+                content.putString(stringBuilder.toString());
+                Clipboard.getSystemClipboard().setContent(content);
+            }
+        };
     }
 
     public void handleSortLogFileClick(ActionEvent actionEvent) {

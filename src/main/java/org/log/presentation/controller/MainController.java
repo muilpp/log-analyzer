@@ -49,29 +49,29 @@ public class MainController implements Initializable {
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
         logFileInteractor = new LogFileInteractor(new LogFileFilterImpl(), new LogFileOpenerImpl(), new LogFileExporterImpl());
-        loadFilterMenu();
+        //loadFilterMenu();
 
         logTabPane.getSelectionModel().selectedItemProperty().addListener(
                 (observableValue, tab, t1) -> setCurrentTab(t1)
         );
     }
 
-    public void loadFilterMenu() {
-        //This is done to reload elements after coming back from the EditFilter menu, would be better to have listeners instead of this
-        //https://stackoverflow.com/questions/29639881/javafx-how-to-use-a-method-in-a-controller-from-another-controller
-        filtersMenu.getItems().removeIf(item -> (item instanceof CheckMenuItem));
-        FilterReader filterReader = new FilterReader(new FilePersistor());
-        List<Filter> filterList = filterReader.readAllFilters();
-
-        System.out.println("Filters found: " + filterList.size());
-
-        filterList.forEach(filter -> {
-            final CheckMenuItem checkMenuItem = new CheckMenuItem(filter.getFilterName());
-            checkMenuItem.setOnAction(e -> handleFilterMenuClick(checkMenuItem));
-            System.out.println("Filter found: " + filter.getFilterName());
-            filtersMenu.getItems().add(checkMenuItem);
-        });
-    }
+//    public void loadFilterMenu() {
+//        //This is done to reload elements after coming back from the EditFilter menu, would be better to have listeners instead of this
+//        //https://stackoverflow.com/questions/29639881/javafx-how-to-use-a-method-in-a-controller-from-another-controller
+//        filtersMenu.getItems().removeIf(item -> (item instanceof CheckMenuItem));
+//        FilterReader filterReader = new FilterReader(new FilePersistor());
+//        List<Filter> filterList = filterReader.readAllFilters();
+//
+//        System.out.println("Filters found: " + filterList.size());
+//
+//        filterList.forEach(filter -> {
+//            final CheckMenuItem checkMenuItem = new CheckMenuItem(filter.getFilterName());
+//            checkMenuItem.setOnAction(e -> handleFilterMenuClick(checkMenuItem));
+//            System.out.println("Filter found: " + filter.getFilterName());
+//            filtersMenu.getItems().add(checkMenuItem);
+//        });
+//    }
 
     public void handleFilterMenuClick(final CheckMenuItem menuItem) {
         FilterReader filterReader = new FilterReader(new FilePersistor());
@@ -159,7 +159,7 @@ public class MainController implements Initializable {
             stage.setTitle("Edit Filters");
             stage.setScene(new Scene(editScene));
             //when closing edit filter, reload menu
-            stage.setOnHidden(e -> loadFilterMenu());
+            //stage.setOnHidden(e -> loadFilterMenu());
             stage.show();
         } catch (IOException e) {
             System.out.println("Could not load edit stage: " + e);
