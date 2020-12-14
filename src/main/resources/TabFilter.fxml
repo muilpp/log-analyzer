@@ -4,7 +4,7 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<BorderPane xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.log.presentation.controller.TabController">
+<BorderPane fx:id="borderPaneTabFilter" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.log.presentation.controller.TabController">
             <top>
                 <VBox BorderPane.alignment="CENTER">
                     <HBox alignment="CENTER" spacing="10.0">
@@ -25,7 +25,7 @@
                             </HBox.margin>
                         </Button>
                     </HBox>
-                    <HBox fx:id="filterCheckBoxes" alignment="CENTER_LEFT" spacing="10.0">
+                    <HBox fx:id="filterCheckBoxes" alignment="CENTER_LEFT">
 
                         <VBox alignment="CENTER_RIGHT" spacing="10.0">
                             <TextField fx:id="filterMatchesText" alignment="CENTER_RIGHT" disable="true" prefHeight="10.0" prefWidth="200.0" HBox.hgrow="NEVER">
@@ -41,6 +41,37 @@
                                     <Insets bottom="5.0" />
                                 </VBox.margin>
                             </CheckBox>
+                            <HBox.margin>
+                                <Insets right="5.0" />
+                            </HBox.margin>
+                            <padding>
+                                <Insets left="40.0" />
+                            </padding>
+                        </VBox>
+                        <VBox alignment="CENTER_RIGHT">
+                            <TextField fx:id="searchFoundMatches" alignment="CENTER" disable="true" prefHeight="10.0" prefWidth="100.0" HBox.hgrow="NEVER">
+                                <HBox.margin>
+                                    <Insets left="5.0" />
+                                </HBox.margin>
+                                <VBox.margin>
+                                    <Insets top="2.0" />
+                                </VBox.margin>
+                            </TextField>
+                            <HBox alignment="CENTER" prefHeight="10.0" prefWidth="200.0">
+                                <VBox.margin>
+                                    <Insets top="5.0" />
+                                </VBox.margin>
+                                <Button fx:id="findPrevious" alignment="CENTER" mnemonicParsing="false" text="▲">
+                                    <HBox.margin>
+                                        <Insets right="10.0" />
+                                    </HBox.margin>
+                                </Button>
+                                <Button fx:id="findNext" alignment="CENTER" mnemonicParsing="false" text="▼">
+                                    <HBox.margin>
+                                        <Insets left="10.0" />
+                                    </HBox.margin>
+                                </Button>
+                            </HBox>
                             <HBox.margin>
                                 <Insets right="5.0" />
                             </HBox.margin>

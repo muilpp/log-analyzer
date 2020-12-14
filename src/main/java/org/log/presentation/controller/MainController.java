@@ -13,20 +13,14 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import org.log.application.service.LogFileInteractor;
-import org.log.application.usecases.FilterReader;
 import org.log.application.usecases.LogFileExporterImpl;
 import org.log.application.usecases.LogFileFilterImpl;
 import org.log.application.usecases.LogFileOpenerImpl;
-import org.log.domain.entities.Filter;
-import org.log.infrastructure.FilePersistor;
 
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
-import java.util.List;
-import java.util.Optional;
 import java.util.ResourceBundle;
-import java.util.stream.Collectors;
 
 public class MainController implements Initializable {
 
@@ -49,52 +43,10 @@ public class MainController implements Initializable {
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
         logFileInteractor = new LogFileInteractor(new LogFileFilterImpl(), new LogFileOpenerImpl(), new LogFileExporterImpl());
-        //loadFilterMenu();
 
         logTabPane.getSelectionModel().selectedItemProperty().addListener(
                 (observableValue, tab, t1) -> setCurrentTab(t1)
         );
-    }
-
-//    public void loadFilterMenu() {
-//        //This is done to reload elements after coming back from the EditFilter menu, would be better to have listeners instead of this
-//        //https://stackoverflow.com/questions/29639881/javafx-how-to-use-a-method-in-a-controller-from-another-controller
-//        filtersMenu.getItems().removeIf(item -> (item instanceof CheckMenuItem));
-//        FilterReader filterReader = new FilterReader(new FilePersistor());
-//        List<Filter> filterList = filterReader.readAllFilters();
-//
-//        System.out.println("Filters found: " + filterList.size());
-//
-//        filterList.forEach(filter -> {
-//            final CheckMenuItem checkMenuItem = new CheckMenuItem(filter.getFilterName());
-//            checkMenuItem.setOnAction(e -> handleFilterMenuClick(checkMenuItem));
-//            System.out.println("Filter found: " + filter.getFilterName());
-//            filtersMenu.getItems().add(checkMenuItem);
-//        });
-//    }
-
-    public void handleFilterMenuClick(final CheckMenuItem menuItem) {
-        FilterReader filterReader = new FilterReader(new FilePersistor());
-        List<Filter> filterList = filterReader.readAllFilters();
-
-        Optional<Filter> foundFilter = filterList.stream().filter(filter -> filter.getFilterName().equalsIgnoreCase(menuItem.getText())).findFirst();
-
-        if (foundFilter.isPresent()) {
-            System.out.println("Filter is present");
-            String filterData = foundFilter.get().getFilterData();
-            String[] dataSplit = filterData.split("\\|");
-            if (menuItem.isSelected()) {
-                System.out.println("Adding filter: " + filterData);
-                //TODO Apply filter!
-                //selectedFilters.addAll(Arrays.asList(dataSplit));
-            } else {
-                System.out.println("Removing filter: " + filterData);
-                //TODO Apply filter!
-                //selectedFilters.removeAll(Arrays.asList(dataSplit));
-            }
-        } else System.out.println("No filter found");
-
-        //TODO Filter current log after applying filters!
     }
 
     public void handleOpenFileMenuClick() {
@@ -124,10 +76,6 @@ public class MainController implements Initializable {
         } catch (IOException e) {
             System.out.println("Could not load file to filter: " + e);
         }
-    }
-
-    private List<MenuItem> getSelectedMenuFilters() {
-        return filtersMenu.getItems().stream().filter(f -> ((CheckMenuItem)f).isSelected()).collect(Collectors.toList());
     }
 
     public void handleExportFileMenuClick(ActionEvent actionEvent) {

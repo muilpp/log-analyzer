@@ -10,17 +10,21 @@ import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.*;
 import javafx.scene.input.*;
+import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
+import javafx.util.Callback;
 import org.log.application.service.LogFileInteractor;
 import org.log.application.usecases.FilterReader;
 import org.log.application.usecases.LogFileExporterImpl;
 import org.log.application.usecases.LogFileFilterImpl;
 import org.log.application.usecases.LogFileOpenerImpl;
 import org.log.infrastructure.FilePersistor;
+import org.log.presentation.FindBox;
 
 import java.net.URL;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class TabController implements Initializable {
     @FXML
@@ -33,6 +37,14 @@ public class TabController implements Initializable {
     public ListView<String> sortedLogFileList, originalLogFileList;
     @FXML
     public HBox filterCheckBoxes;
+    @FXML
+    public TextField searchFoundMatches;
+    @FXML
+    public BorderPane borderPaneTabFilter;
+    @FXML
+    public Button findPrevious;
+    @FXML
+    public Button findNext;
 
     private final List<String> manualFiltersToInclude = new ArrayList<>();
     private final List<String> manualFiltersToExclude = new ArrayList<>();
@@ -40,8 +52,11 @@ public class TabController implements Initializable {
     private LogFileInteractor logFileInteractor;
     private List<String> originalList = new ArrayList<>();
     private final List<String> selectedMenuFilters = new ArrayList<>();
-    private final KeyCombination keyCombinationShiftC = new KeyCodeCombination(KeyCode.C, KeyCombination.CONTROL_DOWN);
+    private final KeyCombination keyCombinationControlC = new KeyCodeCombination(KeyCode.C, KeyCombination.SHORTCUT_DOWN);
+    private final KeyCombination keyCombinationControlF = new KeyCodeCombination(KeyCode.F, KeyCombination.SHORTCUT_DOWN);
     private final FilterReader filterReader = new FilterReader(new FilePersistor());
+    //private static final String HIGHLIGHT_CLASS = "search-highlight";
+    private static final String STANDARD_STYLES = "-fx-background-color: -fx-selection-bar;-fx-background-color: -fx-focus-color, -fx-cell-focus-inner-border, -fx-selection-bar;-fx-background-color: lightgray;-fx-background-color: -fx-cell-hover-color;-fx-background-color: -fx-focus-color, -fx-cell-focus-inner-border, -fx-cell-hover-color;-fx-background-color: linear-gradient(to right, derive(-fx-accent,-7%), derive(-fx-accent,-25%));";
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
@@ -94,8 +109,38 @@ public class TabController implements Initializable {
 
         sortedLogFileList.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
         sortedLogFileList.setOnKeyPressed(copyKeyEventHandler(sortedLogFileList));
+        borderPaneTabFilter.setOnKeyPressed(findKeyEventHandler(sortedLogFileList));
         originalLogFileList.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
         originalLogFileList.setOnKeyPressed(copyKeyEventHandler(originalLogFileList));
+
+        //sortedLogFileList.getStylesheets().add(getClass().getResource("/highlighter.css").toExternalForm());
+
+        sortedLogFileList.setCellFactory(new Callback<>() {
+            @Override
+            public ListCell<String> call(ListView<String> stringListView) {
+                return new ListCell<>(){
+                    @Override
+                    protected void updateItem(String s, boolean b) {
+                        super.updateItem(s, b);
+                        if (s == null) {
+                            setText(null);
+                            setGraphic(null);
+                        } else {
+                            setText(s);
+
+                            if (s.toLowerCase().contains("warning".toLowerCase())){
+                                setStyle("-fx-background-color: yellow;");
+                            } else if (s.toLowerCase().contains("error".toLowerCase())) {
+                                setStyle("-fx-background-color: tomato;");
+                            } else {
+                                //leave it like it is, if not it gets the same styles as above
+                                setStyle("");
+                            }
+                        }
+                    }
+                };
+            }
+        });
 
         loadCheckBoxFilters();
     }
@@ -128,7 +173,7 @@ public class TabController implements Initializable {
 
     private EventHandler<? super KeyEvent> copyKeyEventHandler(final ListView<String> logFileList) {
         return event -> {
-            if (keyCombinationShiftC.match(event)) {
+            if (keyCombinationControlC.match(event)) {
                 List<String> logList = logFileList.getSelectionModel().getSelectedItems();
 
                 final ClipboardContent content = new ClipboardContent();
@@ -141,6 +186,51 @@ public class TabController implements Initializable {
                 System.out.println("Added to clipboard: " + stringBuilder.toString());
                 content.putString(stringBuilder.toString());
                 Clipboard.getSystemClipboard().setContent(content);
+            }
+        };
+    }
+
+    private EventHandler<? super KeyEvent> findKeyEventHandler(final ListView<String> logFileList) {
+        return event -> {
+            if (keyCombinationControlF.match(event)) {
+                String textToFind = FindBox.showFindBox();
+                System.out.println("Text to find: " + textToFind);
+
+                AtomicInteger matchesFound = new AtomicInteger(0);
+                final List<Integer> indexList = new ArrayList<>();
+                for (int i = 0; i < logFileList.getItems().size(); i++) {
+                    if (logFileList.getItems().get(i).contains(textToFind.toLowerCase())) {
+                        System.out.println("Found selected in: " + logFileList.getItems().get(i));
+                        logFileList.getSelectionModel().select(i);
+                        indexList.add(i);
+                        matchesFound.incrementAndGet();
+                    }
+                }
+                System.out.println("Matches found: " + matchesFound);
+                searchFoundMatches.setText("0/"+matchesFound);
+
+                AtomicInteger currentIndex = new AtomicInteger(0);
+                findPrevious.setOnMouseClicked(mouseEvent -> {
+
+                    for (int index : indexList) {
+                        if (currentIndex.getAndIncrement() > index) {
+                            logFileList.scrollTo(index);
+                            searchFoundMatches.setText(currentIndex.get() + "/" + matchesFound.get());
+                        }
+                    }
+                });
+
+                findNext.setOnMouseClicked(mouseEvent -> {
+                    int selectedIndex = logFileList.getSelectionModel().getSelectedIndex();
+
+                    for (int index : indexList) {
+                        if (selectedIndex > index) {
+                            logFileList.scrollTo(index);
+                            currentIndex.incrementAndGet();
+                            searchFoundMatches.setText(currentIndex.get() + "/" + matchesFound.get());
+                        }
+                    }
+                });
             }
         };
     }
