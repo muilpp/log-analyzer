@@ -4,6 +4,7 @@ import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.image.Image;
 import javafx.stage.Stage;
 
 import java.io.IOException;
@@ -19,13 +20,11 @@ public class App extends Application {
         FXMLLoader loader = new FXMLLoader();
         loader.setLocation(getClass().getResource("/Main.fxml"));
         Parent root = loader.load();
-
-        //URL url = Paths.get("./src/main/resources/Main.fxml").toUri().toURL();
-        //Parent root = FXMLLoader.load(url);
-        //Parent root = FXMLLoader.load(getClass().getClassLoader().getResource("/Main.fxml"));
-        window.setTitle("Log Analyzer");
         Scene scene = new Scene(root);
         //scene.getRoot().setStyle("-fx-base:black");
+
+        window.getIcons().add(new Image(getClass().getResourceAsStream("/rocket.png")));
+        window.setTitle("Log Analyzer");
         window.setScene(scene);
         window.setMaximized(true);
         window.show();
