@@ -101,7 +101,7 @@
             </top>
             <center>
                 <SplitPane dividerPositions="0.5" orientation="VERTICAL" prefWidth="160.0" BorderPane.alignment="CENTER_RIGHT">
-                    <ListView fx:id="sortedLogFileList" onMouseClicked="#handleMouseSortedListClick" prefWidth="209.0" />
+                    <ListView fx:id="sortedLogFileList" onMouseClicked="#handleMouseSortedListClick" onKeyReleased="#handleSortedListKeyPressed" prefWidth="209.0" />
                     <ListView fx:id="originalLogFileList" prefWidth="609.0" />
                 </SplitPane>
             </center>

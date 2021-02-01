@@ -63,6 +63,16 @@ public class EditFilterController implements Initializable{
             });
             saveFilterButton.setDisable(false);
         });
+
+        // Continue with this to try to update filters in tab after editing
+//        try {
+//            FXMLLoader loader = new FXMLLoader(this.getClass().getResource("/TabFilter.fxml"));
+//            Parent root = loader.load();
+//            TabController tabController = (TabController) loader.getController();
+//            tabController.loadCheckBoxFilters();
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
     }
 
     public void handleOnSaveFilterClick(ActionEvent actionEvent) {

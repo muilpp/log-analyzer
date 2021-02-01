@@ -312,4 +312,13 @@ public class TabController implements Initializable {
         //originalLogFileList.getFocusModel().focus(selectedSortedListElement);
         originalLogFileList.scrollTo(selectedSortedListElement);
     }
+
+    public void handleSortedListKeyPressed(KeyEvent keyEvent) {
+        if (keyEvent.getCode().equals(KeyCode.DOWN) || keyEvent.getCode().equals(KeyCode.UP)) {
+            keyEvent.consume(); // necessary to prevent event handlers for this event
+            final String selectedSortedListElement = sortedLogFileList.getSelectionModel().getSelectedItem();
+            originalLogFileList.getSelectionModel().select(selectedSortedListElement);
+            originalLogFileList.scrollTo(selectedSortedListElement);
+        }
+    }
 }
