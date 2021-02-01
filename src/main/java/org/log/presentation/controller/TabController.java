@@ -32,23 +32,17 @@ public class TabController implements Initializable {
     @FXML
     public TextArea manualFilterIncludeText, manualFilterExcludeText;
     @FXML
-    public CheckBox sortLogCheckBox;
+    public CheckBox sortLogCheckBox, removeNoDateLogCheckBox;
     @FXML
-    public CheckBox removeNoDateLogCheckBox;
-    @FXML
-    public TextField filterMatchesText;
+    public TextField filterMatchesText, searchFoundMatches;
     @FXML
     public ListView<String> sortedLogFileList, originalLogFileList;
     @FXML
     public HBox filterCheckBoxes;
     @FXML
-    public TextField searchFoundMatches;
-    @FXML
     public BorderPane borderPaneTabFilter;
     @FXML
-    public Button findPrevious;
-    @FXML
-    public Button findNext;
+    public Button findPrevious, findNext;
 
     private final List<String> manualFiltersToInclude = new ArrayList<>();
     private final List<String> manualFiltersToExclude = new ArrayList<>();
@@ -82,6 +76,7 @@ public class TabController implements Initializable {
     }
 
     private void filterLog() {
+        final String selectedSortedListElement = sortedLogFileList.getSelectionModel().getSelectedItem();
         final List<String> filtersToInclude = new ArrayList<>(selectedMenuFilters);
         filtersToInclude.addAll(manualFiltersToInclude);
 
@@ -97,6 +92,9 @@ public class TabController implements Initializable {
         if (removeNoDateLogCheckBox.isSelected()) {
             removeNoDateLog();
         }
+
+        sortedLogFileList.getSelectionModel().select(selectedSortedListElement);
+        sortedLogFileList.scrollTo(selectedSortedListElement);
     }
 
     private void initializeTabElements() {
@@ -259,18 +257,26 @@ public class TabController implements Initializable {
     }
 
     private void sortLogFileByDate() {
+        final String selectedSortedListElement = sortedLogFileList.getSelectionModel().getSelectedItem();
         List<String> sortedLogList = new ArrayList<>(sortedLogFileList.getItems());
         Collections.sort(sortedLogList);
         sortedLogList.removeAll(Arrays.asList("", null));
         sortedLogFileList.getItems().clear();
         sortedLogFileList.getItems().addAll(sortedLogList);
+
+        sortedLogFileList.getSelectionModel().select(selectedSortedListElement);
+        sortedLogFileList.scrollTo(selectedSortedListElement);
     }
 
     private void removeNoDateLog() {
+        final String selectedSortedListElement = sortedLogFileList.getSelectionModel().getSelectedItem();
         List<String> sortedLogList = new ArrayList<>(sortedLogFileList.getItems());
         List<String> timestampFilteredList = sortedLogList.stream().filter(new TimestampLogPredicate()).collect(Collectors.toList());
         sortedLogFileList.getItems().clear();
         sortedLogFileList.getItems().addAll(timestampFilteredList);
+
+        sortedLogFileList.getSelectionModel().select(selectedSortedListElement);
+        sortedLogFileList.scrollTo(selectedSortedListElement);
     }
 
     private void updateManualFilters() {
@@ -301,7 +307,7 @@ public class TabController implements Initializable {
     }
 
     public void handleMouseSortedListClick(MouseEvent mouseEvent) {
-        String selectedSortedListElement = sortedLogFileList.getSelectionModel().getSelectedItem();
+        final String selectedSortedListElement = sortedLogFileList.getSelectionModel().getSelectedItem();
         originalLogFileList.getSelectionModel().select(selectedSortedListElement);
         //originalLogFileList.getFocusModel().focus(selectedSortedListElement);
         originalLogFileList.scrollTo(selectedSortedListElement);

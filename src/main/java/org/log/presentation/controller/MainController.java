@@ -20,6 +20,7 @@ import org.log.application.usecases.LogFileOpenerImpl;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
+import java.util.List;
 import java.util.ResourceBundle;
 
 public class MainController implements Initializable {
@@ -52,16 +53,18 @@ public class MainController implements Initializable {
     public void handleOpenFileMenuClick() {
         System.out.println("Click on open file!");
         FileChooser fileChooser = new FileChooser();
-        File logFile = fileChooser.showOpenDialog(null);
+        List<File> logFileList = fileChooser.showOpenMultipleDialog(null);
 
-        if (logFile != null) {
-            System.out.println("Log file selected: " + logFile.getAbsolutePath());
-            Stage stage = (Stage) menuBar.getScene().getWindow();
-            stage.setTitle(logFile.getName());
-            openLogFile(logFile);
-        } else {
-            System.out.println("Could not open the file!");
-        }
+        logFileList.forEach(file -> {
+            if (file != null) {
+                System.out.println("Opening log file: " + file.getAbsolutePath());
+                Stage stage = (Stage) menuBar.getScene().getWindow();
+                stage.setTitle(file.getName());
+                openLogFile(file);
+            } else {
+                System.out.println("Could not open the file!");
+            }
+        });
     }
 
     private void openLogFile(File logFile) {
@@ -74,7 +77,8 @@ public class MainController implements Initializable {
             tabController.setData(logFileInteractor.loadLogFile(logFile.getPath()));
             logTabPane.getSelectionModel().select(newTab);
         } catch (IOException e) {
-            System.out.println("Could not load file to filter: " + e);
+            System.out.println("Could not load file to filter: " + logFile);
+            e.printStackTrace();
         }
     }
 
