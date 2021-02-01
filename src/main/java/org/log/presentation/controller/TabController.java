@@ -19,18 +19,22 @@ import org.log.application.usecases.FilterReader;
 import org.log.application.usecases.LogFileExporterImpl;
 import org.log.application.usecases.LogFileFilterImpl;
 import org.log.application.usecases.LogFileOpenerImpl;
+import org.log.application.util.TimestampLogPredicate;
 import org.log.infrastructure.FilePersistor;
 import org.log.presentation.FindBox;
 
 import java.net.URL;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Collectors;
 
 public class TabController implements Initializable {
     @FXML
     public TextArea manualFilterIncludeText, manualFilterExcludeText;
     @FXML
     public CheckBox sortLogCheckBox;
+    @FXML
+    public CheckBox removeNoDateLogCheckBox;
     @FXML
     public TextField filterMatchesText;
     @FXML
@@ -89,6 +93,9 @@ public class TabController implements Initializable {
 
         if(sortLogCheckBox.isSelected()) {
             sortLogFileByDate();
+        }
+        if (removeNoDateLogCheckBox.isSelected()) {
+            removeNoDateLog();
         }
     }
 
@@ -243,12 +250,27 @@ public class TabController implements Initializable {
         }
     }
 
+    public void handleRemoveNoDateLogClick(ActionEvent actionEvent) {
+        if (removeNoDateLogCheckBox.isSelected()) {
+            removeNoDateLog();
+        } else {
+            filterLog();
+        }
+    }
+
     private void sortLogFileByDate() {
         List<String> sortedLogList = new ArrayList<>(sortedLogFileList.getItems());
         Collections.sort(sortedLogList);
         sortedLogList.removeAll(Arrays.asList("", null));
         sortedLogFileList.getItems().clear();
         sortedLogFileList.getItems().addAll(sortedLogList);
+    }
+
+    private void removeNoDateLog() {
+        List<String> sortedLogList = new ArrayList<>(sortedLogFileList.getItems());
+        List<String> timestampFilteredList = sortedLogList.stream().filter(new TimestampLogPredicate()).collect(Collectors.toList());
+        sortedLogFileList.getItems().clear();
+        sortedLogFileList.getItems().addAll(timestampFilteredList);
     }
 
     private void updateManualFilters() {
