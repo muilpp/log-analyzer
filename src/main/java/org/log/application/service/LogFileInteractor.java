@@ -30,6 +30,10 @@ public class LogFileInteractor {
         return logFileFilter.filterListBy(originalList, wordsToInclude, wordsToExclude);
     }
 
+    public List<String> removeLogsWithoutTimestamp(List<String> list) {
+        return logFileFilter.removeLogsWithoutTimestamp(list);
+    }
+
     public boolean exportToLog(File file, List<String> logFileList) {
         return logFileExporter.exportLogToFile(file, logFileList);
     }

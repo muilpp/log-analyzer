@@ -4,6 +4,8 @@ import org.log.domain.ports.logfile.LogFileFilter;
 
 import java.util.List;
 import java.util.function.Predicate;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 public class LogFileFilterImpl implements LogFileFilter {
@@ -28,6 +30,11 @@ public class LogFileFilterImpl implements LogFileFilter {
         }
     }
 
+    @Override
+    public List<String> removeLogsWithoutTimestamp(List<String> list) {
+        return list.stream().filter(new TimestampLogPredicate()).collect(Collectors.toList());
+    }
+
     private static class LogFilterPredicate implements Predicate<String> {
         private final List<String> filterList;
         private final boolean isFilterInclude;
@@ -44,6 +51,21 @@ public class LogFileFilterImpl implements LogFileFilter {
                 }
             }
             return !isFilterInclude;
+        }
+    }
+
+    public static class TimestampLogPredicate implements Predicate<String> {
+        @Override
+        public boolean test(String log) {
+            log = log.trim();
+            if (log == null || log.isBlank() || log.isEmpty() || log.length() < 10) {
+                return false;
+            }
+
+            Pattern p = Pattern.compile("\\d\\d\\d\\d-\\d\\d-\\d\\d");
+            Matcher m = p.matcher(log.trim().substring(0,10));
+
+            return m.find();
         }
     }
 }

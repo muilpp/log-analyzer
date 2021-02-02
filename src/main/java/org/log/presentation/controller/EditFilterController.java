@@ -40,6 +40,8 @@ public class EditFilterController implements Initializable{
     public void initialize(URL url, ResourceBundle resourceBundle) {
         populateFilters();
         saveFilterButton.setDisable(true);
+
+        filterContentText.setOnKeyReleased(keyEvent -> saveFilterButton.setDisable(false));
     }
 
     private void populateFilters() {
@@ -61,7 +63,6 @@ public class EditFilterController implements Initializable{
                     filterContentText.setText(filter.getFilterData());
                 }
             });
-            saveFilterButton.setDisable(false);
         });
 
         // Continue with this to try to update filters in tab after editing
@@ -86,6 +87,7 @@ public class EditFilterController implements Initializable{
         if (isUpdated) {
             System.out.println("Updated!");
             populateFilters();
+            saveFilterButton.setDisable(true);
         } else System.out.println("Not updated!");
         filterListView.getSelectionModel().select(filterListIndex);
     }
