@@ -1,5 +1,7 @@
 package org.log.application.usecases;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.log.domain.ports.logfile.LogFileFilter;
 
 import java.util.List;
@@ -9,16 +11,17 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 public class LogFileFilterImpl implements LogFileFilter {
+    private Logger logger = LogManager.getLogger(LogFileFilterImpl.class);
 
     @Override
     public List<String> filterListBy(List<String> originalList, List<String> wordsToInclude, List<String> wordsToExclude) {
         LogFilterPredicate includeFilterPredicate = new LogFilterPredicate(wordsToInclude, true);
         LogFilterPredicate excludeFilterPredicate = new LogFilterPredicate(wordsToExclude, false);
 
-        System.out.println("Words to include:");
+        logger.debug("Words to include:");
         wordsToInclude.forEach(System.out::println);
 
-        System.out.println("Words to exclude:");
+        logger.debug("Words to exclude:");
         wordsToExclude.forEach(System.out::println);
 
         if (wordsToInclude.isEmpty()) {

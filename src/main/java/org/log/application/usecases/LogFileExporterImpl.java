@@ -1,5 +1,7 @@
 package org.log.application.usecases;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.log.domain.ports.logfile.LogFileExporter;
 
 import java.io.File;
@@ -8,6 +10,7 @@ import java.io.PrintWriter;
 import java.util.List;
 
 public class LogFileExporterImpl implements LogFileExporter {
+    private static final Logger logger = LogManager.getLogger(LogFileExporterImpl.class);
 
     @Override
     public boolean exportLogToFile(File file, List<String> logFileList) {
@@ -21,7 +24,7 @@ public class LogFileExporterImpl implements LogFileExporter {
             writer.close();
             return true;
         } catch (IOException ex) {
-            System.out.println("Could not save log to file: " + ex);
+            logger.error("LogFileExporterImpl.exportLogToFile:: Could not save log to file: " + ex);
             return false;
         }
     }

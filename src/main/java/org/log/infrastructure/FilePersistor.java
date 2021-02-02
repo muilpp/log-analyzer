@@ -4,6 +4,8 @@ import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVPrinter;
 import org.apache.commons.csv.CSVRecord;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.log.domain.entities.Filter;
 import org.log.domain.ports.filter.FilterRepository;
 
@@ -21,6 +23,7 @@ import static java.nio.file.StandardOpenOption.CREATE;
 
 public class FilePersistor implements FilterRepository {
     private static final String FILTERS_FILENAME = "filters.csv";
+    private Logger logger = LogManager.getLogger(FilePersistor.class);
 
     @Override
     public List<Filter> findAll() {
@@ -36,7 +39,7 @@ public class FilePersistor implements FilterRepository {
                 //}
             }
         } catch (IOException e) {
-            System.out.println("Error fetching filters: " + e);
+            logger.error("FilePersistor.findAll:: Error fetching filters: " + e);
         }
 
         return filterList;
@@ -44,7 +47,7 @@ public class FilePersistor implements FilterRepository {
 
     @Override
     public boolean create(String filterName, String filterData) {
-        System.out.println("Create filter with name: " + filterName);
+        logger.debug("Create filter with name: " + filterName);
 
         boolean doesFilterAlreadyExists = findAll().stream().anyMatch(filter -> filter.getFilterName().equalsIgnoreCase(filterName));
 
@@ -58,7 +61,7 @@ public class FilePersistor implements FilterRepository {
             csvPrinter.flush();
 
         } catch (IOException e) {
-            System.out.println("Error creating filter: " + e);
+            logger.error("FilePersistor.create:: Error creating filter: " + e);
             return false;
         }
 
@@ -74,17 +77,17 @@ public class FilePersistor implements FilterRepository {
             for (CSVRecord csvRecord : csvParser) {
                 Filter filter;
                 if (csvRecord.get(0).equalsIgnoreCase(filterName)) {
-                    System.out.println("Found filter, edit with: " + filterData);
+                    logger.debug("Found filter, edit with: " + filterData);
                     filter = new Filter(csvRecord.get(0), filterData);
                 } else {
-                    System.out.println("Filter not found yet...: " + csvRecord.get(0));
+                    logger.debug("Filter not found yet...: " + csvRecord.get(0));
                     filter = new Filter(csvRecord.get(0), csvRecord.get(1));
                 }
                 filterList.add(filter);
             }
             return overrideFilterFile(filterList);
         } catch (IOException e) {
-            System.out.println("Error updating filters: " + e);
+            logger.error("FilePersistor.update:: Error updating filter: " + e);
         }
         return false;
     }
@@ -95,17 +98,17 @@ public class FilePersistor implements FilterRepository {
 
             filterList.forEach(filter -> {
                 try {
-                    System.out.println("Adding to file: " + filter.getFilterName() + ": " + filter.getFilterData());
+                    logger.debug("Adding to file: " + filter.getFilterName() + ": " + filter.getFilterData());
                     csvPrinter.printRecord(filter.getFilterName(), filter.getFilterData());
                     csvPrinter.flush();
                 } catch (IOException e) {
-                    System.out.println("Error saving to filter file: " + e);
+                    logger.error("FilePersistor.overrideFilterFile:: Error saving to filter file: " + e);
                 }
             });
 
             return true;
         } catch (IOException e) {
-            System.out.println("Error overriding filter file: " + e);
+            logger.error("FilePersistor.overrideFilterFile:: Error overriding filter: " + e);
             return false;
         }
     }

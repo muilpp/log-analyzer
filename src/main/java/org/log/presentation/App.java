@@ -6,12 +6,15 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.image.Image;
 import javafx.stage.Stage;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.io.IOException;
 
 public class App extends Application {
 
     private Stage window;
+    private static final Logger logger = LogManager.getLogger(App.class);
 
     @Override
     public void start(Stage stage) throws IOException {
@@ -37,10 +40,10 @@ public class App extends Application {
     private void closeProgram() {
         boolean exit = ConfirmBox.display("Exit", "Are you sure you want to leave?");
         if (exit) {
-            System.out.println("File is saved!");
+            logger.debug("File is saved!");
             window.close();
         } else {
-            System.out.println("Good decision");
+            logger.debug("Good decision");
         }
     }
 

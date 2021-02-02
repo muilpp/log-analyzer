@@ -14,6 +14,8 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.util.Callback;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.log.application.service.LogFileInteractor;
 import org.log.application.usecases.FilterReader;
 import org.log.application.usecases.LogFileExporterImpl;
@@ -44,6 +46,7 @@ public class TabController implements Initializable {
 
     private final List<String> manualFiltersToInclude = new ArrayList<>();
     private final List<String> manualFiltersToExclude = new ArrayList<>();
+    private static final Logger logger = LogManager.getLogger(TabController.class);
 
     private LogFileInteractor logFileInteractor;
     private List<String> originalList = new ArrayList<>();
@@ -82,7 +85,7 @@ public class TabController implements Initializable {
         sortedLogFileList.getItems().clear();
         sortedLogFileList.getItems().addAll(filteredList);
         filterMatchesText.setText(sortedLogFileList.getItems().size() + " matches found.");
-        System.out.println("List size after filtering: " + sortedLogFileList.getItems().size());
+        logger.debug("List size after filtering: " + sortedLogFileList.getItems().size());
 
         if(sortLogCheckBox.isSelected()) {
             sortLogFileByDate();
@@ -156,10 +159,10 @@ public class TabController implements Initializable {
                 public void changed(ObservableValue<? extends Boolean> observableValue, Boolean aBoolean, Boolean isSelected) {
                     String[] dataSplit = f.getFilterData().split("\\|");
                     if (isSelected) {
-                        System.out.println("Adding filter: " + f.getFilterData());
+                        logger.debug("Adding filter: " + f.getFilterData());
                         selectedMenuFilters.addAll(Arrays.asList(dataSplit));
                     } else {
-                        System.out.println("Removing filter: " + f.getFilterData());
+                        logger.debug("Removing filter: " + f.getFilterData());
                         selectedMenuFilters.removeAll(Arrays.asList(dataSplit));
                     }
                     filterLog();
@@ -182,11 +185,11 @@ public class TabController implements Initializable {
                 final ClipboardContent content = new ClipboardContent();
                 StringBuilder stringBuilder = new StringBuilder();
                 for (String log : logList) {
-                    System.out.println("Found selected: " + log);
+                    logger.debug("Found selected: " + log);
                     stringBuilder.append(log).append("\n");
                 }
                 stringBuilder = stringBuilder.replace(stringBuilder.lastIndexOf("\n"), stringBuilder.lastIndexOf("\n")+2, "");
-                System.out.println("Added to clipboard: " + stringBuilder.toString());
+                logger.debug("Added to clipboard: " + stringBuilder.toString());
                 content.putString(stringBuilder.toString());
                 Clipboard.getSystemClipboard().setContent(content);
             }
@@ -197,19 +200,20 @@ public class TabController implements Initializable {
         return event -> {
             if (keyCombinationControlF.match(event)) {
                 String textToFind = FindBox.showFindBox();
-                System.out.println("Text to find: " + textToFind);
+                logger.debug("Text to find: " + textToFind);
 
                 AtomicInteger matchesFound = new AtomicInteger(0);
                 final List<Integer> indexList = new ArrayList<>();
                 for (int i = 0; i < logFileList.getItems().size(); i++) {
                     if (logFileList.getItems().get(i).contains(textToFind.toLowerCase())) {
-                        System.out.println("Found selected in: " + logFileList.getItems().get(i));
+                        logger.debug("Found selected in: " + logFileList.getItems().get(i));
                         logFileList.getSelectionModel().select(i);
                         indexList.add(i);
                         matchesFound.incrementAndGet();
                     }
                 }
-                System.out.println("Matches found: " + matchesFound);
+
+                logger.debug("Matches found: " + matchesFound);
                 searchFoundMatches.setText("0/"+matchesFound);
 
                 AtomicInteger currentIndex = new AtomicInteger(0);

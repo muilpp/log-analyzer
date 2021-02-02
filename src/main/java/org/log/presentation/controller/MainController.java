@@ -12,6 +12,8 @@ import javafx.stage.FileChooser;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.log.application.service.LogFileInteractor;
 import org.log.application.usecases.LogFileExporterImpl;
 import org.log.application.usecases.LogFileFilterImpl;
@@ -38,6 +40,7 @@ public class MainController implements Initializable {
     @FXML
     public VBox mainVerticalBox;
 
+    private static final Logger logger = LogManager.getLogger(MainController.class);
     private LogFileInteractor logFileInteractor;
     private Tab currentTab;
 
@@ -51,18 +54,18 @@ public class MainController implements Initializable {
     }
 
     public void handleOpenFileMenuClick() {
-        System.out.println("Click on open file!");
+        logger.debug("Click on open file!");
         FileChooser fileChooser = new FileChooser();
         List<File> logFileList = fileChooser.showOpenMultipleDialog(null);
 
         logFileList.forEach(file -> {
             if (file != null) {
-                System.out.println("Opening log file: " + file.getAbsolutePath());
+                logger.debug("Opening log file: " + file.getAbsolutePath());
                 Stage stage = (Stage) menuBar.getScene().getWindow();
                 stage.setTitle(file.getName());
                 openLogFile(file);
             } else {
-                System.out.println("Could not open the file!");
+                logger.error("MainController.handleOpenFileMenuClick:: Could not open the file because it's null");
             }
         });
     }
@@ -77,7 +80,7 @@ public class MainController implements Initializable {
             tabController.setData(logFileInteractor.loadLogFile(logFile.getPath()));
             logTabPane.getSelectionModel().select(newTab);
         } catch (IOException e) {
-            System.out.println("Could not load file to filter: " + logFile);
+            logger.error("MainController.openLogFile:: Could not load file to filter: " + logFile);
             e.printStackTrace();
         }
     }
@@ -114,7 +117,7 @@ public class MainController implements Initializable {
             //stage.setOnHidden(e -> loadFilterMenu());
             stage.show();
         } catch (IOException e) {
-            System.out.println("Could not load edit stage: " + e);
+            logger.error("MainController.handleOnEditFiltersClick:: Could not load edit stage: " + e);
         }
     }
 
