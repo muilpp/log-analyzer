@@ -308,6 +308,8 @@ public class TabController implements Initializable {
 
     public void handleMouseSortedListClick(MouseEvent mouseEvent) {
         final String selectedSortedListElement = sortedLogFileList.getSelectionModel().getSelectedItem();
+
+        clearOriginalListSelections();
         originalLogFileList.getSelectionModel().select(selectedSortedListElement);
         //originalLogFileList.getFocusModel().focus(selectedSortedListElement);
         originalLogFileList.scrollTo(selectedSortedListElement);
@@ -316,9 +318,16 @@ public class TabController implements Initializable {
     public void handleSortedListKeyPressed(KeyEvent keyEvent) {
         if (keyEvent.getCode().equals(KeyCode.DOWN) || keyEvent.getCode().equals(KeyCode.UP)) {
             keyEvent.consume(); // necessary to prevent event handlers for this event
+
             final String selectedSortedListElement = sortedLogFileList.getSelectionModel().getSelectedItem();
+
+            clearOriginalListSelections();
             originalLogFileList.getSelectionModel().select(selectedSortedListElement);
             originalLogFileList.scrollTo(selectedSortedListElement);
         }
+    }
+
+    private void clearOriginalListSelections() {
+        originalLogFileList.getSelectionModel().clearAndSelect(-1);
     }
 }
