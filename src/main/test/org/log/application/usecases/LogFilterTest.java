@@ -98,4 +98,20 @@ public class LogFilterTest {
 
         Assertions.assertEquals(filteredList.size(), originalList.size(), "Nothing should be filtered when filters are empty!");
     }
+
+    @Test
+    public void logLinesWithoutTimestampAreRemoved() {
+        List<String> testList = new ArrayList<>(originalList);
+        testList.addAll(Arrays.asList("2021-02-01 20:03:56,790 DEBUG> [MCPTT 7193] MCPTT_GEORED_LIB ConnectivityInteractorImpl.onGeoredCheck: [GeoredConnectionStatus] oldIp=mcptt1.myvzw.com, newIp=mcptt1.myvzw.com, checktime02-01 20:03:56.789, isServerIpSwitchedfalse",
+                "Interface [13] rmnet_data1, host address= 2600:100c:d2c3:5c87:9c03:d144:bf95:ffef",
+                "Interface [13] rmnet_data1, host address= 10.169.243.182",
+                "",
+                "2021-02-01 20:03:56,790 DEBUG> [MCPTT 7193] MCPTT_CONN_LIB ConnectivityInteractorImpl.setCurrentIp: mcptt1.myvzw.com",
+                "Log:",
+                "2021-02-01 20:03:56,791 DEBUG> [MCPTT 7193] MCPTT_TAG_GEORED_INTEGRATION SpiService.onGeoredCheck called, GeoredConnectionStatus = [GeoredConnectionStatus] oldIp=mcptt1.myvzw.com, newIp=mcptt1.myvzw.com, checktime02-01 20:03:56.789, isServerIpSwitchedfalse"));
+
+        testList = logFileFilter.removeLogsWithoutTimestamp(testList);
+
+        Assertions.assertEquals(3, testList.size(), "The list without timestamps should have 3 elements, but it has " + testList.size() + " instead");
+    }
 }
