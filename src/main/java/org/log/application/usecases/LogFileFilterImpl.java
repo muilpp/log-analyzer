@@ -18,11 +18,8 @@ public class LogFileFilterImpl implements LogFileFilter {
         LogFilterPredicate includeFilterPredicate = new LogFilterPredicate(wordsToInclude, true);
         LogFilterPredicate excludeFilterPredicate = new LogFilterPredicate(wordsToExclude, false);
 
-        logger.debug("Words to include:");
-        wordsToInclude.forEach(System.out::println);
-
-        logger.debug("Words to exclude:");
-        wordsToExclude.forEach(System.out::println);
+        logger.info("Words to include: " + wordsToInclude.toString());
+        logger.info("Words to exclude: " + wordsToExclude.toString());
 
         if (wordsToInclude.isEmpty()) {
             return originalList.stream().filter(excludeFilterPredicate).collect(Collectors.toList());
