@@ -12,6 +12,8 @@ import javafx.scene.control.TextArea;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.log.application.usecases.FilterEraser;
 import org.log.application.usecases.FilterReader;
 import org.log.application.usecases.FilterUpdater;
@@ -36,10 +38,14 @@ public class EditFilterController implements Initializable{
     @FXML
     public Button saveFilterButton;
 
+    private static final Logger logger = LogManager.getLogger(EditFilterController.class);
+
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
         populateFilters();
         saveFilterButton.setDisable(true);
+
+        filterContentText.setOnKeyReleased(keyEvent -> saveFilterButton.setDisable(false));
     }
 
     private void populateFilters() {
@@ -48,21 +54,30 @@ public class EditFilterController implements Initializable{
         filterListView.getItems().clear();
 
         filterList.forEach(filter -> {
-            System.out.println("Filter found -> " + filter.getFilterName());
+            logger.debug("Filter found -> " + filter.getFilterName());
             filterListView.getItems().add(filter.getFilterName());
         });
 
         filterListView.setOnMouseClicked(mouseEvent -> {
             String filterName = filterListView.getSelectionModel().getSelectedItem();
-            System.out.println("clicked on " + filterName);
+            logger.debug("clicked on " + filterName);
 
             filterList.forEach(filter -> {
                 if (filter.getFilterName().equalsIgnoreCase(filterName)) {
                     filterContentText.setText(filter.getFilterData());
                 }
             });
-            saveFilterButton.setDisable(false);
         });
+
+        // Continue with this to try to update filters in tab after editing
+//        try {
+//            FXMLLoader loader = new FXMLLoader(this.getClass().getResource("/TabFilter.fxml"));
+//            Parent root = loader.load();
+//            TabController tabController = (TabController) loader.getController();
+//            tabController.loadCheckBoxFilters();
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
     }
 
     public void handleOnSaveFilterClick(ActionEvent actionEvent) {
@@ -74,9 +89,10 @@ public class EditFilterController implements Initializable{
 
         boolean isUpdated = filterUpdater.update(filterName, filterData);
         if (isUpdated) {
-            System.out.println("Updated!");
+            logger.debug("Updated!");
             populateFilters();
-        } else System.out.println("Not updated!");
+            saveFilterButton.setDisable(true);
+        } else logger.debug("Not updated!");
         filterListView.getSelectionModel().select(filterListIndex);
     }
 
@@ -99,7 +115,7 @@ public class EditFilterController implements Initializable{
             stage.setOnHidden(e -> populateFilters());
             stage.show();
         } catch (IOException e) {
-            System.out.println("Could not load new filter stage: " + e.getMessage());
+            logger.error("EditFilterController.handleOnCreateFilterClick:: Could not load new filter stage: " + e.getMessage());
             e.printStackTrace();
         }
     }
@@ -110,9 +126,9 @@ public class EditFilterController implements Initializable{
 
         boolean isDeleted = filterEraser.delete(filterName);
         if (isDeleted) {
-            System.out.println("Deleted!");
+            logger.debug("Deleted!");
             populateFilters();
             filterContentText.setText("");
-        } else System.out.println("Not deleted!");
+        } else logger.debug("Not deleted!");
     }
 }

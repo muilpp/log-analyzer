@@ -11,47 +11,50 @@ import java.util.List;
 public class LogFileCreatorTest {
 
     private final FilePersistor filePersistor = new FilePersistor();
-    private final String filterName = "testFilterName";
-    private final String filterData = "testFilterData";
+    private static final String FILTER_NAME = "newFilter";
+    private static final String FILTER_DATA = "filterData";
 
     @AfterEach
     public void deleteFilter() {
-        filePersistor.delete(filterName);
+        filePersistor.delete(FILTER_NAME);
     }
 
     @Test
     public void newFilterIsCreated() {
-        boolean isCreated = filePersistor.create(filterName, filterData);
+
+
+        boolean isCreated = filePersistor.create(FILTER_NAME, FILTER_DATA);
         Assertions.assertTrue(isCreated);
 
         List<Filter> filterList = filePersistor.findAll();
         boolean isNewFilterFound = false;
         for (Filter filter : filterList) {
-            if (filter.getFilterName().equalsIgnoreCase(filterName)
-                    && filter.getFilterData().equalsIgnoreCase(filterData)) {
+            if (filter.getFilterName().equalsIgnoreCase(FILTER_NAME)
+                    && filter.getFilterData().equalsIgnoreCase(FILTER_DATA)) {
                 isNewFilterFound = true;
                 break;
             }
         }
-        Assertions.assertTrue(isNewFilterFound, "Filter " + filterName + " should have been created, but it's not in the list");
+        Assertions.assertTrue(isNewFilterFound, "Filter " + FILTER_NAME + " should have been created, but it's not in the list");
     }
 
     @Test
     public void filterIsNotCreatedIfAlreadyExists() {
-        filePersistor.create(filterName, filterData);
+        boolean isFilterCreated = filePersistor.create(FILTER_NAME, FILTER_DATA);
+        Assertions.assertTrue(isFilterCreated);
 
-        boolean isCreated = filePersistor.create(filterName, filterData);
-        Assertions.assertFalse(isCreated);
+        boolean isDuplicatedCreated = filePersistor.create(FILTER_NAME, FILTER_DATA);
+        Assertions.assertFalse(isDuplicatedCreated);
 
         List<Filter> filterList = filePersistor.findAll();
         boolean isFilterFound = false;
         for (Filter filter : filterList) {
-            if (filter.getFilterName().equalsIgnoreCase(filterName)
-                    && filter.getFilterData().equalsIgnoreCase(filterData)) {
+            if (filter.getFilterName().equalsIgnoreCase(FILTER_NAME)
+                    && filter.getFilterData().equalsIgnoreCase(FILTER_DATA)) {
                 isFilterFound = true;
                 break;
             }
         }
-        Assertions.assertTrue(isFilterFound, "Filter " + filterName + " should be in the list, but was not found");
+        Assertions.assertTrue(isFilterFound, "Filter " + FILTER_NAME + " should be in the list, but was not found");
     }
 }

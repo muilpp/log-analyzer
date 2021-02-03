@@ -1,5 +1,7 @@
 package org.log.application.usecases;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.log.domain.ports.logfile.LogFileOpener;
 
 import java.io.File;
@@ -9,6 +11,7 @@ import java.util.List;
 import java.util.Scanner;
 
 public class LogFileOpenerImpl implements LogFileOpener {
+    private static final Logger logger = LogManager.getLogger(LogFileOpenerImpl.class);
 
     @Override
     public List<String> openFile(String fileName) {
@@ -23,7 +26,7 @@ public class LogFileOpenerImpl implements LogFileOpener {
             }
             logReader.close();
         } catch (FileNotFoundException e) {
-            System.out.println("File not found: " + e);
+            logger.error("LogFileOpenerImpl.openFile:: File not found: " + e);
         }
         return logList;
     }

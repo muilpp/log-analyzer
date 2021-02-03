@@ -1,8 +1,8 @@
 package org.log.application.service;
 
+import org.log.domain.ports.logfile.LogFileExporter;
 import org.log.domain.ports.logfile.LogFileFilter;
 import org.log.domain.ports.logfile.LogFileOpener;
-import org.log.domain.ports.logfile.LogFileExporter;
 
 import java.io.File;
 import java.util.List;
@@ -28,6 +28,10 @@ public class LogFileInteractor {
             return originalList;
 
         return logFileFilter.filterListBy(originalList, wordsToInclude, wordsToExclude);
+    }
+
+    public List<String> removeLogsWithoutTimestamp(List<String> list) {
+        return logFileFilter.removeLogsWithoutTimestamp(list);
     }
 
     public boolean exportToLog(File file, List<String> logFileList) {

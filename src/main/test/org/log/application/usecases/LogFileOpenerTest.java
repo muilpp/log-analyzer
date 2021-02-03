@@ -1,6 +1,11 @@
 package org.log.application.usecases;
 
-import org.junit.jupiter.api.*;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.log.domain.ports.logfile.LogFileOpener;
 
 import java.io.File;
@@ -13,6 +18,7 @@ import java.util.Arrays;
 import java.util.List;
 
 public class LogFileOpenerTest {
+    private static final Logger logger = LogManager.getLogger(LogFileOpenerTest.class);
     private final String FILE_NAME = "logFile.txt";
     private final LogFileOpener logFileOpener = new LogFileOpenerImpl();
     private List<String> logList;
@@ -34,7 +40,7 @@ public class LogFileOpenerTest {
 
             fileStream.close();
         } catch (IOException e) {
-            System.out.println("An error occurred while trying to write to file.");
+            logger.error("LogFileOpenerTest.createFilterFile:: An error occurred while trying to write to file: " + e);
         }
     }
 
@@ -47,7 +53,7 @@ public class LogFileOpenerTest {
     public void fileIsOpenedAndContentCorrectlyProcessedWhenFileIsNotEmpty() {
         List<String> fileLogList = logFileOpener.openFile(FILE_NAME);
         Assertions.assertEquals(logList.size(), fileLogList.size());
-        System.out.println(fileLogList);
+        logger.debug(fileLogList);
     }
 
     @Test
@@ -55,7 +61,7 @@ public class LogFileOpenerTest {
         new PrintStream(new File(FILE_NAME));
         List<String> fileLogList = logFileOpener.openFile(FILE_NAME);
         Assertions.assertEquals(0, fileLogList.size());
-        System.out.println(fileLogList);
+        logger.debug(fileLogList);
     }
 
     @Test

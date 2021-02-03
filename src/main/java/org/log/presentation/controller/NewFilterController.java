@@ -47,11 +47,9 @@ public class NewFilterController implements Initializable {
             filterNameText.setStyle("-fx-border-color: #FF0000");
             String filterName = filterNameText.getText();
             filterNameText.setText("FILTER NAME: " + filterName + " ALREADY EXISTS, CHANGE IT!");
-            System.out.println("Filtre ja existeix, poso fondo vermell!");
         } else {
             FilterCreator filterCreator = new FilterCreator(new FilePersistor());
             filterCreator.create(filterNameText.getText(), filterContentText.getText());
-            System.out.println("Tot ok, creo filtre");
 
             stage.close();
         }
