@@ -1,4 +1,12 @@
-veritate,veritate
-geored,updateLastGeored|checkTo|Active threads
-sip,INVITE
-rtp,"received "
+App start,for flavor
+RTCP,Subtype: TB_REQUEST|TB_GRANTED|TB_RELEASE|TB_TAKEN|START_AUDIO|STOP_AUDIO|receivedDataRTC|PPTT_BUTTON_PRESSED|PTT_BUTTON_RELEASE
+Connectivity,onAvailable|onLost|bindProcessToNetwork|onLinkProperties|connection changed from|onDeviceConnectionChanged
+HA FO,Trigger HA fail over|HighAvailabilityConnectivityInteractorImpl
+Geored FO,server will be switched to|switch back to main server
+Geored,GeoredConnectivityInteractorImpl.checkServerResponses georedundancy check to |GeoredConnectivityInteractorImpl.startCheckTask:|GeoredConnectivityInteractorImpl.GeoredRunnableTask: task performed in|GeoredConnectivityInteractorImpl.checkServerResponses result=|GeoredConnectivityInteractorImpl.checkServerStatus georedundancy check to|GeoredConnectivityInteractorImpl.getAvailableServer|GeoredUtils.switchToServer georedundancy from|HttpRequestUtils.getHttpClient: conn|GeoredConnectivityInteractorImpl.shouldSwitchSite|GeoredConnectivityInteractorImpl.GeoredRunnableTask.run Active threads ->|SpiService.onGeoredCheck|onGeoredCheck
+Server Connectivity,ServerConnectivityInteractorImpl.checkConnection|currentStatus
+CallEvent,MCPTT_CALL_EVENT
+Video,MSG_INTERNAL_VIDEO_START
+Disconnection Screen,SpiService.showDisconnectionScreen
+SIP,SIP_LIB|MCPTT_SIP_MESSAGE
+File transfer,MCPTT_FILE

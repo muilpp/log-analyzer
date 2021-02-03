@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<SplitPane dividerPositions="0.29797979797979796" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="600.0" prefWidth="800.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.log.presentation.controller.EditFilterController">
+    <VBox minHeight="0.0" minWidth="0.0" prefHeight="160.0" prefWidth="100.0" spacing="10.0">
+        <Label alignment="CENTER" contentDisplay="CENTER" text="Filters:" textAlignment="CENTER">
+            <padding>
+              <Insets left="5.0" top="5.0" />
+            </padding>
+        </Label>
+        <ListView fx:id="filterListView" prefHeight="400.0" prefWidth="200.0" />
+        <HBox prefHeight="100.0" prefWidth="200.0" spacing="15.0">
+            <padding>
+                <Insets left="15.0" top="25.0" />
+            </padding>
+            <Button fx:id="createFilterButton" onAction="#handleOnCreateFilterClick" mnemonicParsing="false" text="Create" />
+            <Button fx:id="deleteFilterButton" onAction="#handleOnDeleteFilterClick" mnemonicParsing="false" text="Delete" />
+        </HBox>
+    </VBox>
+    <VBox alignment="TOP_CENTER" minHeight="0.0" minWidth="0.0" prefHeight="160.0" prefWidth="100.0" spacing="10.0">
+        <Label alignment="CENTER" contentDisplay="CENTER" text="Remember to separate each filter with a pipe!" textAlignment="CENTER">
+            <padding>
+                <Insets left="5.0" top="5.0" />
+            </padding>
+        </Label>
+        <TextArea fx:id="filterContentText" prefHeight="400.0" prefWidth="200.0" wrapText="true">
+        </TextArea>
+        <HBox alignment="TOP_CENTER" prefHeight="100.0" prefWidth="200.0" spacing="10.0">
+            <padding>
+                <Insets left="5.0" top="25.0" />
+            </padding>
+            <Button fx:id="saveFilterButton" onAction="#handleOnSaveFilterClick" mnemonicParsing="false" text="Save" />
+        </HBox>
+    </VBox>
+</SplitPane>

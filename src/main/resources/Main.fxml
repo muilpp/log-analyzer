@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox fx:id="mainVerticalBox" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.log.presentation.controller.MainController">
+    <MenuBar fx:id="menuBar">
+        <Menu text="File">
+            <MenuItem fx:id="openFileMenu" onAction="#handleOpenFileMenuClick" text="Open file.." />
+            <MenuItem fx:id="exportFileMenu" onAction="#handleExportFileMenuClick" text="Export file.." />
+            <SeparatorMenuItem />
+            <MenuItem fx:id="exitFileMenu" onAction="#handleExitMenuClick" text="Exit" />
+        </Menu>
+        <Menu fx:id="filtersMenu" text="Filters">
+            <MenuItem fx:id="editFilters" onAction="#handleOnEditFiltersClick" text="Edit Filters" />
+        </Menu>
+    </MenuBar>
+   <TabPane fx:id="logTabPane" prefHeight="200.0" prefWidth="200.0" tabClosingPolicy="ALL_TABS" VBox.vgrow="ALWAYS">
+   </TabPane>
+</VBox>
