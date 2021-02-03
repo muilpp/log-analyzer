@@ -1,4 +1,4 @@
-package org.log.presentation;
+package org.log.presentation.box;
 
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;

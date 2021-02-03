@@ -1,10 +1,11 @@
-package org.log.presentation;
+package org.log.presentation.box;
 
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
+import javafx.scene.input.KeyCode;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Modality;
@@ -29,6 +30,14 @@ public class FindBox {
 
         TextField textField = new TextField();
         textField.setAlignment(Pos.CENTER);
+
+        textField.setOnKeyReleased(keyEvent -> {
+            if (keyEvent.getCode() == KeyCode.ENTER) {
+                textToFind = textField.getText();
+                window.close();
+            }
+        });
+
         Button findButton = new Button("Find");
         findButton.setOnAction(actionEvent -> {
             textToFind = textField.getText();
