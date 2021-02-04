@@ -150,6 +150,18 @@ public class TabController implements Initializable {
     }
 
     public void loadCheckBoxFilters() {
+
+        var vBoxRef = new Object() {
+            VBox vBox = new VBox();
+        };
+
+        var hBoxRef = new Object() {
+            HBox hBox = new HBox();
+        };
+        hBoxRef.hBox.setId(UUID.randomUUID().toString());
+        hBoxRef.hBox.setSpacing(10);
+        hBoxRef.hBox.setPadding(new Insets(10));
+
         filterReader.readAllFilters().forEach(f -> {
             CheckBox filterCheckBox = new CheckBox(f.getFilterName());
             filterCheckBox.selectedProperty().addListener(new ChangeListener<Boolean>() {
@@ -171,8 +183,19 @@ public class TabController implements Initializable {
             vBox.setAlignment(Pos.CENTER_LEFT);
             vBox.setSpacing(20);
             vBox.setPadding(new Insets(0, 15, 0, 0));
-            filterCheckBoxes.getChildren().add(0, vBox);
+
+            if (hBoxRef.hBox.getChildren().size() <= 8) {
+                hBoxRef.hBox.getChildren().add(vBox);
+            } else {
+                filterCheckBoxes.getChildren().add(0, hBoxRef.hBox);
+                vBoxRef.vBox.getChildren().addAll(hBoxRef.hBox);
+                hBoxRef.hBox = new HBox();
+                hBoxRef.hBox.setPadding(new Insets(10));
+                hBoxRef.hBox.setId(UUID.randomUUID().toString());
+            }
         });
+        vBoxRef.vBox.getChildren().addAll(hBoxRef.hBox);
+        filterCheckBoxes.getChildren().add(0, vBoxRef.vBox);
     }
 
     private EventHandler<? super KeyEvent> handleKeyEventPressed(final ListView<String> logFileList) {
