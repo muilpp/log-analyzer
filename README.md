@@ -5,7 +5,7 @@ Java desktop application to filter and analyze logs. Developed with JavaFX.
 ### Features
 - Filter (include or exclude certain keywords). Separate with a pipe (|), to use multiple keywords.
 
-- Create your own filters in the menu and use them with a simple click. *The filter will appear the next time you open a tab*
+- Create your own filters in the menu and use them with a simple click. *It will appear the next time you open a tab*
 
 - Split screen, filtered file appears above, original file below. 
 
