@@ -115,11 +115,9 @@ public class TabController implements Initializable {
         });
 
         sortedLogFileList.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
-        sortedLogFileList.setOnKeyPressed(copyKeyEventHandler(sortedLogFileList));
-        sortedLogFileList.setOnKeyReleased(findKeyEventHandler(sortedLogFileList));
+        sortedLogFileList.setOnKeyPressed(handleKeyEventPressed(sortedLogFileList));
         originalLogFileList.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
-        originalLogFileList.setOnKeyPressed(copyKeyEventHandler(originalLogFileList));
-        originalLogFileList.setOnKeyReleased(findKeyEventHandler(originalLogFileList));
+        originalLogFileList.setOnKeyPressed(handleKeyEventPressed(originalLogFileList));
 
         sortedLogFileList.setCellFactory(new Callback<>() {
             @Override
@@ -177,110 +175,111 @@ public class TabController implements Initializable {
         });
     }
 
-    private EventHandler<? super KeyEvent> copyKeyEventHandler(final ListView<String> logFileList) {
+    private EventHandler<? super KeyEvent> handleKeyEventPressed(final ListView<String> logFileList) {
         return event -> {
             if (keyCombinationControlC.match(event)) {
-                List<String> logList = logFileList.getSelectionModel().getSelectedItems();
-
-                final ClipboardContent content = new ClipboardContent();
-                StringBuilder stringBuilder = new StringBuilder();
-                for (String log : logList) {
-                    logger.debug("Found selected: " + log);
-                    stringBuilder.append(log).append("\n");
-                }
-                stringBuilder = stringBuilder.replace(stringBuilder.lastIndexOf("\n"), stringBuilder.lastIndexOf("\n")+2, "");
-                logger.debug("Added to clipboard: " + stringBuilder.toString());
-                content.putString(stringBuilder.toString());
-                Clipboard.getSystemClipboard().setContent(content);
+                handleLineCopyEvent(logFileList);
+            } else if (keyCombinationControlF.match(event)) {
+                handleFindTextEvent(logFileList);
             }
         };
     }
 
-    private EventHandler<? super KeyEvent> findKeyEventHandler(final ListView<String> logFileList) {
-        return event -> {
-            if (keyCombinationControlF.match(event)) {
-                String textToFind = FindBox.showFindBox();
-                logger.debug("Text to find: " + textToFind);
+    private void handleLineCopyEvent(final ListView<String> logFileList) {
+        List<String> logList = logFileList.getSelectionModel().getSelectedItems();
 
-                if (textToFind == null || Strings.isEmpty(textToFind))
-                    return;
+        final ClipboardContent content = new ClipboardContent();
+        StringBuilder stringBuilder = new StringBuilder();
+        for (String log : logList) {
+            logger.debug("Found selected: " + log);
+            stringBuilder.append(log).append("\n");
+        }
+        stringBuilder = stringBuilder.replace(stringBuilder.lastIndexOf("\n"), stringBuilder.lastIndexOf("\n")+2, "");
+        logger.debug("Added to clipboard: " + stringBuilder.toString());
+        content.putString(stringBuilder.toString());
+        Clipboard.getSystemClipboard().setContent(content);
+    }
 
-                clearSortedListSelections();
-                AtomicInteger matchesFound = new AtomicInteger(0);
-                final List<Integer> matchIndexPositionList = new ArrayList<>();
-                for (int i = 0; i < logFileList.getItems().size(); i++) {
-                    if (logFileList.getItems().get(i).toLowerCase().contains(textToFind.toLowerCase())) {
-                        logger.debug("Found selected in: " + logFileList.getItems().get(i));
-                        logFileList.getSelectionModel().select(i);
-                        logFileList.getFocusModel().focus(i);
-                        matchIndexPositionList.add(i);
-                        matchesFound.incrementAndGet();
-                    }
+    private void handleFindTextEvent(final ListView<String> logFileList) {
+        String textToFind = FindBox.showFindBox();
+        logger.debug("Text to find: " + textToFind);
+
+        if (textToFind == null || Strings.isEmpty(textToFind))
+            return;
+
+        clearSortedListSelections();
+        AtomicInteger matchesFound = new AtomicInteger(0);
+        final List<Integer> matchIndexPositionList = new ArrayList<>();
+        for (int i = 0; i < logFileList.getItems().size(); i++) {
+            if (logFileList.getItems().get(i).toLowerCase().contains(textToFind.toLowerCase())) {
+                logger.debug("Found selected in: " + logFileList.getItems().get(i));
+                logFileList.getSelectionModel().select(i);
+                logFileList.getFocusModel().focus(i);
+                matchIndexPositionList.add(i);
+                matchesFound.incrementAndGet();
+            }
+        }
+
+        logger.debug("Matches found: " + matchesFound);
+        searchFoundMatches.setText("1/"+matchesFound);
+        findPrevious.setOnMouseClicked(mouseEvent -> {
+
+            List<Integer> reverseMatchesList = new ArrayList<>(matchIndexPositionList);
+            Collections.reverse(reverseMatchesList);
+            logger.debug("Matches indexes: " + reverseMatchesList.toString());
+
+            for (int i = 0; i < reverseMatchesList.size(); i++) {
+                int currentSelectedIndex = logFileList.getSelectionModel().getSelectedIndex();
+                logger.debug("Currently selected index: " + currentSelectedIndex);
+                int matchIndex = reverseMatchesList.get(i);
+
+                if (currentSelectedIndex <= reverseMatchesList.get(reverseMatchesList.size()-1)) {
+                    clearSortedListSelections();
+                    logger.debug("Current index too big, going to last position again");
+                    logFileList.scrollTo(reverseMatchesList.get(0));
+                    logFileList.getSelectionModel().select(reverseMatchesList.get(0));
+                    searchFoundMatches.setText(reverseMatchesList.size() + "/" + matchesFound.get());
+                    break;
                 }
 
-                logger.debug("Matches found: " + matchesFound);
-                //AtomicInteger currentIndex = new AtomicInteger(1);
-                searchFoundMatches.setText("1/"+matchesFound);
-                findPrevious.setOnMouseClicked(mouseEvent -> {
-
-                    List<Integer> reverseMatchesList = new ArrayList<>(matchIndexPositionList);
-                    Collections.reverse(reverseMatchesList);
-                    logger.debug("Matches indexes: " + reverseMatchesList.toString());
-
-                    for (int i = 0; i < reverseMatchesList.size(); i++) {
-                        int currentSelectedIndex = logFileList.getSelectionModel().getSelectedIndex();
-                        logger.debug("Currently selected index: " + currentSelectedIndex);
-                        int matchIndex = reverseMatchesList.get(i);
-
-                        if (currentSelectedIndex <= reverseMatchesList.get(reverseMatchesList.size()-1)) {
-                            clearSortedListSelections();
-                            logger.debug("Current index too big, going to last position again");
-                            logFileList.scrollTo(reverseMatchesList.get(0));
-                            logFileList.getSelectionModel().select(reverseMatchesList.get(0));
-                            searchFoundMatches.setText(reverseMatchesList.size() + "/" + matchesFound.get());
-                            break;
-                        }
-
-                        if (currentSelectedIndex > matchIndex) {
-                            clearSortedListSelections();
-                            logger.debug("Selected index bigger, going to: " + matchIndex);
-                            logFileList.scrollTo(matchIndex);
-                            logFileList.getSelectionModel().select(matchIndex);
-                            searchFoundMatches.setText(reverseMatchesList.size()-i + "/" + matchesFound.get());
-                            break;
-                        }
-                    }
-                });
-
-                findNext.setOnMouseClicked(mouseEvent -> {
-                    logger.debug("Matches indexes: " + matchIndexPositionList.toString());
-
-                    for (int i = 0; i < matchIndexPositionList.size(); i++) {
-                        int currentSelectedIndex = logFileList.getSelectionModel().getSelectedIndex();
-                        logger.debug("Currently selected index: " + currentSelectedIndex);
-                        int matchIndex = matchIndexPositionList.get(i);
-
-                        if (currentSelectedIndex >= matchIndexPositionList.get(matchIndexPositionList.size()-1)) {
-                            clearSortedListSelections();
-                            logger.debug("Current index too big, going to first position again");
-                            logFileList.scrollTo(matchIndexPositionList.get(0));
-                            logFileList.getSelectionModel().select(0);
-                            searchFoundMatches.setText(1 + "/" + matchesFound.get());
-                            break;
-                        }
-
-                        if (matchIndex > currentSelectedIndex) {
-                            clearSortedListSelections();
-                            logger.debug("Selected index bigger, going to: " + matchIndex);
-                            logFileList.scrollTo(matchIndex);
-                            logFileList.getSelectionModel().select(matchIndex);
-                            searchFoundMatches.setText(i+1 + "/" + matchesFound.get());
-                            break;
-                        }
-                    }
-                });
+                if (currentSelectedIndex > matchIndex) {
+                    clearSortedListSelections();
+                    logger.debug("Selected index bigger, going to: " + matchIndex);
+                    logFileList.scrollTo(matchIndex);
+                    logFileList.getSelectionModel().select(matchIndex);
+                    searchFoundMatches.setText(reverseMatchesList.size()-i + "/" + matchesFound.get());
+                    break;
+                }
             }
-        };
+        });
+
+        findNext.setOnMouseClicked(mouseEvent -> {
+            logger.debug("Matches indexes: " + matchIndexPositionList.toString());
+
+            for (int i = 0; i < matchIndexPositionList.size(); i++) {
+                int currentSelectedIndex = logFileList.getSelectionModel().getSelectedIndex();
+                logger.debug("Currently selected index: " + currentSelectedIndex);
+                int matchIndex = matchIndexPositionList.get(i);
+
+                if (currentSelectedIndex >= matchIndexPositionList.get(matchIndexPositionList.size()-1)) {
+                    clearSortedListSelections();
+                    logger.debug("Current index too big, going to first position again");
+                    logFileList.scrollTo(matchIndexPositionList.get(0));
+                    logFileList.getSelectionModel().select(0);
+                    searchFoundMatches.setText(1 + "/" + matchesFound.get());
+                    break;
+                }
+
+                if (matchIndex > currentSelectedIndex) {
+                    clearSortedListSelections();
+                    logger.debug("Selected index bigger, going to: " + matchIndex);
+                    logFileList.scrollTo(matchIndex);
+                    logFileList.getSelectionModel().select(matchIndex);
+                    searchFoundMatches.setText(i+1 + "/" + matchesFound.get());
+                    break;
+                }
+            }
+        });
     }
 
     public void handleSortLogFileClick(ActionEvent actionEvent) {
