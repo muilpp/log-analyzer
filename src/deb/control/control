@@ -1,0 +1,8 @@
+Package: LogAnalyzer
+Version: 1.1
+Section: misc
+Priority: low
+Architecture: all
+Description: Interactive way to filter and analyze logs
+Maintainer: Marc Pratllusà <marc.p@xtremis.com>
+Depends: default-jre | java11-runtime

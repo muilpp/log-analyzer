@@ -32,3 +32,4 @@ target/*
 .attach_pid*
 
 !LogAnalyzer-*.jar
+!*.deb

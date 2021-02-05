@@ -1,0 +1,12 @@
+[Desktop Entry]
+Name=LogAnalyzer
+Comment=Interactive way to filter and analyze logs
+GenericName=LogAnalyzer
+Keywords=LogAnalyzer
+Exec=java -jar /usr/share/jdeb/lib/LogAnalyzer-1.1.jar
+Icon=/usr/share/jdeb/lib/rocket.png
+Terminal=false
+X-MultipleArgs=false
+Type=Application
+MimeType=application/x-java-archive
+StartupNotify=true
