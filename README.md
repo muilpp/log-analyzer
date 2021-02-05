@@ -31,10 +31,14 @@ mvn package
 ```
 ### Usage
 
-Make sure to have the file *filters.csv* in the same directory as the jar file. Then run the artifact:
-```bash
-java -jar LogAnalyzer-X.X.jar
-```
+Make sure to have the file *filters.csv* in the same directory as the jar file. Then:
+
+- #### On Linux:
+
+  Open ```target/LogAnalyzer_X.X_all.deb ```
+
+- #### On Mac & Windows: 
+  ```java -jar target/LogAnalyzer-X.X.jar ```
 
 ### Contributing
 Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change.
