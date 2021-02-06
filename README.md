@@ -1,4 +1,4 @@
-## Log Analyzer   ![Java CI with Maven](https://github.com/muilpp/log-analyzer/workflows/Java%20CI%20with%20Maven/badge.svg?branch=main)
+## Log Analyzer   [<img src="https://github.com/muilpp/log-analyzer/workflows/Java%20CI%20with%20Maven/badge.svg?branch=main">](https://github.com/muilpp/log-analyzer/actions?query=workflow%3A%22Java+CI+with+Maven%22)
 
 Java desktop application to filter and analyze logs. Developed with JavaFX.
 
