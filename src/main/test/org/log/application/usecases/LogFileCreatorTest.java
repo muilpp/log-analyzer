@@ -20,6 +20,11 @@ public class LogFileCreatorTest {
     }
 
     @Test
+    public void failingTest() {
+        Assertions.assertEquals(1, 0);
+    }
+    
+    @Test
     public void newFilterIsCreated() {
 
 
