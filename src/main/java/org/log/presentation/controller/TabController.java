@@ -244,65 +244,71 @@ public class TabController implements Initializable {
         }
 
         logger.debug("Matches found: " + matchesFound);
-        searchFoundMatches.setText("1/"+matchesFound);
-        findPrevious.setOnMouseClicked(mouseEvent -> {
+        if (matchesFound.get() > 0) {
+            searchFoundMatches.setText("1/"+matchesFound);
+            findPrevious.setOnMouseClicked(mouseEvent -> {
 
-            List<Integer> reverseMatchesList = new ArrayList<>(matchIndexPositionList);
-            Collections.reverse(reverseMatchesList);
-            logger.debug("Matches indexes: " + reverseMatchesList.toString());
+                List<Integer> reverseMatchesList = new ArrayList<>(matchIndexPositionList);
+                Collections.reverse(reverseMatchesList);
+                logger.debug("Matches indexes: " + reverseMatchesList.toString());
 
-            for (int i = 0; i < reverseMatchesList.size(); i++) {
-                int currentSelectedIndex = logFileList.getSelectionModel().getSelectedIndex();
-                logger.debug("Currently selected index: " + currentSelectedIndex);
-                int matchIndex = reverseMatchesList.get(i);
+                for (int i = 0; i < reverseMatchesList.size(); i++) {
+                    int currentSelectedIndex = logFileList.getSelectionModel().getSelectedIndex();
+                    logger.debug("Currently selected index: " + currentSelectedIndex);
+                    int matchIndex = reverseMatchesList.get(i);
 
-                if (currentSelectedIndex <= reverseMatchesList.get(reverseMatchesList.size()-1)) {
-                    clearSortedListSelections();
-                    logger.debug("Current index too big, going to last position again");
-                    logFileList.scrollTo(reverseMatchesList.get(0));
-                    logFileList.getSelectionModel().select(reverseMatchesList.get(0));
-                    searchFoundMatches.setText(reverseMatchesList.size() + "/" + matchesFound.get());
-                    break;
+                    if (currentSelectedIndex <= reverseMatchesList.get(reverseMatchesList.size()-1)) {
+                        clearSortedListSelections();
+                        logger.debug("Current index too big, going to last position again");
+                        logFileList.scrollTo(reverseMatchesList.get(0));
+                        logFileList.getSelectionModel().select(reverseMatchesList.get(0));
+                        searchFoundMatches.setText(reverseMatchesList.size() + "/" + matchesFound.get());
+                        break;
+                    }
+
+                    if (currentSelectedIndex > matchIndex) {
+                        clearSortedListSelections();
+                        logger.debug("Selected index bigger, going to: " + matchIndex);
+                        logFileList.scrollTo(matchIndex);
+                        logFileList.getSelectionModel().select(matchIndex);
+                        searchFoundMatches.setText(reverseMatchesList.size()-i + "/" + matchesFound.get());
+                        break;
+                    }
                 }
+            });
 
-                if (currentSelectedIndex > matchIndex) {
-                    clearSortedListSelections();
-                    logger.debug("Selected index bigger, going to: " + matchIndex);
-                    logFileList.scrollTo(matchIndex);
-                    logFileList.getSelectionModel().select(matchIndex);
-                    searchFoundMatches.setText(reverseMatchesList.size()-i + "/" + matchesFound.get());
-                    break;
+            findNext.setOnMouseClicked(mouseEvent -> {
+                logger.debug("Matches indexes: " + matchIndexPositionList.toString());
+
+                for (int i = 0; i < matchIndexPositionList.size(); i++) {
+                    int currentSelectedIndex = logFileList.getSelectionModel().getSelectedIndex();
+                    logger.debug("Currently selected index: " + currentSelectedIndex);
+                    int matchIndex = matchIndexPositionList.get(i);
+
+                    if (currentSelectedIndex >= matchIndexPositionList.get(matchIndexPositionList.size()-1)) {
+                        clearSortedListSelections();
+                        logger.debug("Current index too big, going to first position again");
+                        logFileList.scrollTo(matchIndexPositionList.get(0));
+                        logFileList.getSelectionModel().select(0);
+                        searchFoundMatches.setText(1 + "/" + matchesFound.get());
+                        break;
+                    }
+
+                    if (matchIndex > currentSelectedIndex) {
+                        clearSortedListSelections();
+                        logger.debug("Selected index bigger, going to: " + matchIndex);
+                        logFileList.scrollTo(matchIndex);
+                        logFileList.getSelectionModel().select(matchIndex);
+                        searchFoundMatches.setText(i+1 + "/" + matchesFound.get());
+                        break;
+                    }
                 }
-            }
-        });
-
-        findNext.setOnMouseClicked(mouseEvent -> {
-            logger.debug("Matches indexes: " + matchIndexPositionList.toString());
-
-            for (int i = 0; i < matchIndexPositionList.size(); i++) {
-                int currentSelectedIndex = logFileList.getSelectionModel().getSelectedIndex();
-                logger.debug("Currently selected index: " + currentSelectedIndex);
-                int matchIndex = matchIndexPositionList.get(i);
-
-                if (currentSelectedIndex >= matchIndexPositionList.get(matchIndexPositionList.size()-1)) {
-                    clearSortedListSelections();
-                    logger.debug("Current index too big, going to first position again");
-                    logFileList.scrollTo(matchIndexPositionList.get(0));
-                    logFileList.getSelectionModel().select(0);
-                    searchFoundMatches.setText(1 + "/" + matchesFound.get());
-                    break;
-                }
-
-                if (matchIndex > currentSelectedIndex) {
-                    clearSortedListSelections();
-                    logger.debug("Selected index bigger, going to: " + matchIndex);
-                    logFileList.scrollTo(matchIndex);
-                    logFileList.getSelectionModel().select(matchIndex);
-                    searchFoundMatches.setText(i+1 + "/" + matchesFound.get());
-                    break;
-                }
-            }
-        });
+            });
+        } else {
+            findPrevious.setOnMouseClicked(null);
+            findNext.setOnMouseClicked(null);
+            searchFoundMatches.setText("No matches found");
+        }
     }
 
     public void handleSortLogFileClick(ActionEvent actionEvent) {

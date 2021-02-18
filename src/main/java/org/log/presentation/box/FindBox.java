@@ -19,16 +19,17 @@ public class FindBox {
         Stage window = new Stage();
         window.initModality(Modality.APPLICATION_MODAL);
         window.setHeight(150);
-        window.setWidth(300);
+        window.setWidth(800);
         window.setTitle("Find");
         window.setAlwaysOnTop(true);
 
         HBox findBox = new HBox(40);
         findBox.setAlignment(Pos.BOTTOM_CENTER);
         findBox.prefHeight(100);
-        findBox.prefWidth(200);
+        findBox.prefWidth(700);
 
         TextField textField = new TextField();
+        textField.setMinWidth(600);
         textField.setAlignment(Pos.CENTER);
 
         textField.setOnKeyReleased(keyEvent -> {
@@ -48,7 +49,7 @@ public class FindBox {
         layout.setPadding(new Insets(15, 0, 0, 0));
         layout.setAlignment(Pos.TOP_CENTER);
         layout.prefHeight(200);
-        layout.prefWidth(300);
+        layout.prefWidth(800);
         findBox.getChildren().addAll(textField, findButton);
         layout.getChildren().addAll(findBox);
 
