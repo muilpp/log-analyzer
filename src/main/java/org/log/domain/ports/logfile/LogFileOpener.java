@@ -1,9 +1,11 @@
 package org.log.domain.ports.logfile;
 
+import javafx.scene.text.Text;
+
 import java.util.List;
 
 public interface LogFileOpener {
 
-    List<String> openFile(String fileName);
+    List<Text> openFile(String fileName);
 
 }

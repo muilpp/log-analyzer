@@ -1,9 +1,11 @@
 package org.log.domain.ports.logfile;
 
+import javafx.scene.text.Text;
+
 import java.util.List;
 
 public interface LogFileFilter {
 
-    List<String> filterListBy(List<String> originalList, List<String> wordsToInclude, List<String> wordsToExclude);
-    List<String> removeLogsWithoutTimestamp(List<String> originalList);
+    List<Text> filterListBy(List<Text> originalList, List<String> wordsToInclude, List<String> wordsToExclude);
+    List<Text> removeLogsWithoutTimestamp(List<Text> originalList);
 }

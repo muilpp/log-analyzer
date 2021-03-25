@@ -13,6 +13,7 @@ import javafx.scene.input.*;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
+import javafx.scene.text.Text;
 import javafx.util.Callback;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -28,6 +29,7 @@ import org.log.presentation.box.FindBox;
 import java.net.URL;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Collectors;
 
 public class TabController implements Initializable {
     @FXML
@@ -37,7 +39,7 @@ public class TabController implements Initializable {
     @FXML
     public TextField filterMatchesText, searchFoundMatches;
     @FXML
-    public ListView<String> sortedLogFileList, originalLogFileList;
+    public ListView<Text> sortedLogFileList, originalLogFileList;
     @FXML
     public HBox filterCheckBoxes;
     @FXML
@@ -50,7 +52,7 @@ public class TabController implements Initializable {
     private static final Logger logger = LogManager.getLogger(TabController.class);
 
     private LogFileInteractor logFileInteractor;
-    private List<String> originalList = new ArrayList<>();
+    private List<Text> originalList = new ArrayList<>();
     private final List<String> selectedMenuFilters = new ArrayList<>();
     private final KeyCombination keyCombinationControlC = new KeyCodeCombination(KeyCode.C, KeyCombination.SHORTCUT_DOWN);
     private final KeyCombination keyCombinationControlF = new KeyCodeCombination(KeyCode.F, KeyCombination.SHORTCUT_DOWN);
@@ -65,7 +67,7 @@ public class TabController implements Initializable {
         initializeTabElements();
     }
 
-    public void setData(List<String> list) {
+    public void setData(List<Text> list) {
         this.originalList = new ArrayList<>(list);
 
         originalLogFileList.getItems().addAll(originalList);
@@ -78,13 +80,20 @@ public class TabController implements Initializable {
     }
 
     private void filterLog() {
-        final String selectedSortedListElement = sortedLogFileList.getSelectionModel().getSelectedItem();
+        final Text selectedSortedListElement = sortedLogFileList.getSelectionModel().getSelectedItem();
         final List<String> filtersToInclude = new ArrayList<>(selectedMenuFilters);
         filtersToInclude.addAll(manualFiltersToInclude);
 
-        List<String> filteredList = logFileInteractor.filterListBy(originalList, filtersToInclude, manualFiltersToExclude);
+        originalList = setTextListStyle(originalList, "");
+
+        List<Text> filteredList = logFileInteractor.filterListBy(originalList, filtersToInclude, manualFiltersToExclude);
+        if (!filtersToInclude.isEmpty()) {
+            filteredList = setTextListStyle(filteredList, "-fx-fill: #60499F;-fx-font-weight:bold;");
+        }
+
         sortedLogFileList.getItems().clear();
         sortedLogFileList.getItems().addAll(filteredList);
+
         filterMatchesText.setText(sortedLogFileList.getItems().size() + " matches found.");
         logger.debug("List size after filtering: " + sortedLogFileList.getItems().size());
 
@@ -97,6 +106,13 @@ public class TabController implements Initializable {
 
         sortedLogFileList.getSelectionModel().select(selectedSortedListElement);
         sortedLogFileList.scrollTo(selectedSortedListElement);
+    }
+
+    private List<Text> setTextListStyle(List<Text> list, String style) {
+        return list.stream().map(line -> {
+            line.setStyle(style);
+            return line;
+        }).collect(Collectors.toList());
     }
 
     private void initializeTabElements() {
@@ -123,20 +139,20 @@ public class TabController implements Initializable {
 
         sortedLogFileList.setCellFactory(new Callback<>() {
             @Override
-            public ListCell<String> call(ListView<String> stringListView) {
-                return new ListCell<>(){
+            public ListCell<Text> call(ListView<Text> stringListView) {
+                return new ListCell<>() {
                     @Override
-                    protected void updateItem(String s, boolean b) {
+                    protected void updateItem(Text s, boolean b) {
                         super.updateItem(s, b);
                         if (s == null) {
                             setText(null);
                             setGraphic(null);
                         } else {
-                            setText(s);
+                            setText(s.getText());
 
-                            if (s.toLowerCase().contains("warning".toLowerCase())){
+                            if (s.getText().toLowerCase().contains("warning".toLowerCase())) {
                                 setStyle("-fx-background-color: yellow;");
-                            } else if (s.toLowerCase().contains("error".toLowerCase())) {
+                            } else if (s.getText().toLowerCase().contains("error".toLowerCase())) {
                                 setStyle("-fx-background-color: tomato;");
                             } else {
                                 //leave it like it is, if not it gets the same styles as above
@@ -177,14 +193,14 @@ public class TabController implements Initializable {
         });
     }
 
-    private EventHandler<? super KeyEvent> copyKeyEventHandler(final ListView<String> logFileList) {
+    private EventHandler<? super KeyEvent> copyKeyEventHandler(final ListView<Text> logFileList) {
         return event -> {
             if (keyCombinationControlC.match(event)) {
-                List<String> logList = logFileList.getSelectionModel().getSelectedItems();
+                List<Text> logList = logFileList.getSelectionModel().getSelectedItems();
 
                 final ClipboardContent content = new ClipboardContent();
                 StringBuilder stringBuilder = new StringBuilder();
-                for (String log : logList) {
+                for (Text log : logList) {
                     logger.debug("Found selected: " + log);
                     stringBuilder.append(log).append("\n");
                 }
@@ -196,7 +212,7 @@ public class TabController implements Initializable {
         };
     }
 
-    private EventHandler<? super KeyEvent> findKeyEventHandler(final ListView<String> logFileList) {
+    private EventHandler<? super KeyEvent> findKeyEventHandler(final ListView<Text> logFileList) {
         return event -> {
             if (keyCombinationControlF.match(event)) {
                 String textToFind = FindBox.showFindBox();
@@ -209,7 +225,7 @@ public class TabController implements Initializable {
                 AtomicInteger matchesFound = new AtomicInteger(0);
                 final List<Integer> matchIndexPositionList = new ArrayList<>();
                 for (int i = 0; i < logFileList.getItems().size(); i++) {
-                    if (logFileList.getItems().get(i).toLowerCase().contains(textToFind.toLowerCase())) {
+                    if (logFileList.getItems().get(i).getText().toLowerCase().contains(textToFind.toLowerCase())) {
                         logger.debug("Found selected in: " + logFileList.getItems().get(i));
                         logFileList.getSelectionModel().select(i);
                         logFileList.getFocusModel().focus(i);
@@ -300,10 +316,10 @@ public class TabController implements Initializable {
     }
 
     private void sortLogFileByDate() {
-        final String selectedSortedListElement = sortedLogFileList.getSelectionModel().getSelectedItem();
-        List<String> sortedLogList = new ArrayList<>(sortedLogFileList.getItems());
-        Collections.sort(sortedLogList);
-        sortedLogList.removeAll(Arrays.asList("", null));
+        final Text selectedSortedListElement = sortedLogFileList.getSelectionModel().getSelectedItem();
+        List<Text> sortedLogList = new ArrayList<>(sortedLogFileList.getItems());
+        sortedLogList.sort(Comparator.comparing(Text::getText));
+        sortedLogList.removeIf(text -> text.getText().isEmpty());
         sortedLogFileList.getItems().clear();
         sortedLogFileList.getItems().addAll(sortedLogList);
 
@@ -312,9 +328,9 @@ public class TabController implements Initializable {
     }
 
     private void removeNoDateLog() {
-        final String selectedSortedListElement = sortedLogFileList.getSelectionModel().getSelectedItem();
-        List<String> sortedLogList = new ArrayList<>(sortedLogFileList.getItems());
-        List<String> timestampFilteredList = logFileInteractor.removeLogsWithoutTimestamp(sortedLogList);
+        final Text selectedSortedListElement = sortedLogFileList.getSelectionModel().getSelectedItem();
+        List<Text> sortedLogList = new ArrayList<>(sortedLogFileList.getItems());
+        List<Text> timestampFilteredList = logFileInteractor.removeLogsWithoutTimestamp(sortedLogList);
 
         sortedLogFileList.getItems().clear();
         sortedLogFileList.getItems().addAll(timestampFilteredList);
@@ -350,9 +366,9 @@ public class TabController implements Initializable {
     }
 
     public void handleMouseSortedListClick(MouseEvent mouseEvent) {
-        final String selectedSortedListElement = sortedLogFileList.getSelectionModel().getSelectedItem();
+        final Text selectedSortedListElement = sortedLogFileList.getSelectionModel().getSelectedItem();
 
-        clearOriginalListSelections();
+        clearListSelections(originalLogFileList);
         originalLogFileList.getSelectionModel().select(selectedSortedListElement);
         //originalLogFileList.getFocusModel().focus(selectedSortedListElement);
         originalLogFileList.scrollTo(selectedSortedListElement);
@@ -362,11 +378,35 @@ public class TabController implements Initializable {
         if (keyEvent.getCode().equals(KeyCode.DOWN) || keyEvent.getCode().equals(KeyCode.UP)) {
             keyEvent.consume(); // necessary to prevent event handlers for this event
 
-            final String selectedSortedListElement = sortedLogFileList.getSelectionModel().getSelectedItem();
+            final Text selectedSortedListElement = sortedLogFileList.getSelectionModel().getSelectedItem();
 
-            clearOriginalListSelections();
+            clearListSelections(originalLogFileList);
             originalLogFileList.getSelectionModel().select(selectedSortedListElement);
             originalLogFileList.scrollTo(selectedSortedListElement);
+        }
+    }
+
+    public void handleMouseOriginalListClick(MouseEvent mouseEvent) {
+        final Text selectedOriginalListElement = originalLogFileList.getSelectionModel().getSelectedItem();
+
+        if (sortedLogFileList.getItems().contains(selectedOriginalListElement)) {
+            clearListSelections(sortedLogFileList);
+            sortedLogFileList.getSelectionModel().select(selectedOriginalListElement);
+            sortedLogFileList.scrollTo(selectedOriginalListElement);
+        }
+    }
+
+    public void handleOriginalListKeyPressed(KeyEvent keyEvent) {
+        if (keyEvent.getCode().equals(KeyCode.DOWN) || keyEvent.getCode().equals(KeyCode.UP)) {
+            keyEvent.consume(); // necessary to prevent event handlers for this event
+
+            final Text originalSortedListElement = originalLogFileList.getSelectionModel().getSelectedItem();
+
+            if (sortedLogFileList.getItems().contains(originalSortedListElement)) {
+                clearListSelections(sortedLogFileList);
+                sortedLogFileList.getSelectionModel().select(originalSortedListElement);
+                sortedLogFileList.scrollTo(originalSortedListElement);
+            }
         }
     }
 
@@ -374,7 +414,7 @@ public class TabController implements Initializable {
         sortedLogFileList.getSelectionModel().clearAndSelect(-1);
     }
 
-    private void clearOriginalListSelections() {
-        originalLogFileList.getSelectionModel().clearAndSelect(-1);
+    private void clearListSelections(ListView<Text> list) {
+        list.getSelectionModel().clearAndSelect(-1);
     }
 }
