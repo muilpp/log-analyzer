@@ -1,5 +1,6 @@
 package org.log.application.service;
 
+import javafx.scene.text.Text;
 import org.log.domain.ports.logfile.LogFileExporter;
 import org.log.domain.ports.logfile.LogFileFilter;
 import org.log.domain.ports.logfile.LogFileOpener;
@@ -19,18 +20,18 @@ public class LogFileInteractor {
         this.logFileExporter = logFileExporter;
     }
 
-    public List<String> loadLogFile(String logFileName) {
+    public List<Text> loadLogFile(String logFileName) {
         return logFileOpener.openFile(logFileName);
     }
 
-    public List<String> filterListBy(List<String> originalList, List<String> wordsToInclude, List<String> wordsToExclude) {
+    public List<Text> filterListBy(List<Text> originalList, List<String> wordsToInclude, List<String> wordsToExclude) {
         if (wordsToInclude.isEmpty() && wordsToExclude.isEmpty())
             return originalList;
 
         return logFileFilter.filterListBy(originalList, wordsToInclude, wordsToExclude);
     }
 
-    public List<String> removeLogsWithoutTimestamp(List<String> list) {
+    public List<Text> removeLogsWithoutTimestamp(List<Text> list) {
         return logFileFilter.removeLogsWithoutTimestamp(list);
     }
 

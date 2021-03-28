@@ -1,5 +1,6 @@
 package org.log.application.usecases;
 
+import javafx.scene.text.Text;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.log.domain.ports.logfile.LogFileFilter;
@@ -14,7 +15,7 @@ public class LogFileFilterImpl implements LogFileFilter {
     private Logger logger = LogManager.getLogger(LogFileFilterImpl.class);
 
     @Override
-    public List<String> filterListBy(List<String> originalList, List<String> wordsToInclude, List<String> wordsToExclude) {
+    public List<Text> filterListBy(List<Text> originalList, List<String> wordsToInclude, List<String> wordsToExclude) {
         LogFilterPredicate includeFilterPredicate = new LogFilterPredicate(wordsToInclude, true);
         LogFilterPredicate excludeFilterPredicate = new LogFilterPredicate(wordsToExclude, false);
 
@@ -31,11 +32,11 @@ public class LogFileFilterImpl implements LogFileFilter {
     }
 
     @Override
-    public List<String> removeLogsWithoutTimestamp(List<String> list) {
+    public List<Text> removeLogsWithoutTimestamp(List<Text> list) {
         return list.stream().filter(new TimestampLogPredicate()).collect(Collectors.toList());
     }
 
-    private static class LogFilterPredicate implements Predicate<String> {
+    private static class LogFilterPredicate implements Predicate<Text> {
         private final List<String> filterList;
         private final boolean isFilterInclude;
 
@@ -44,9 +45,9 @@ public class LogFileFilterImpl implements LogFileFilter {
             this.isFilterInclude = isFilterInclude;
         }
 
-        public boolean test(String strings) {
+        public boolean test(Text strings) {
             for (String filter : filterList) {
-                if (strings.toLowerCase().contains(filter.toLowerCase())) {
+                if (strings.getText().toLowerCase().contains(filter.toLowerCase())) {
                     return isFilterInclude;
                 }
             }
@@ -54,9 +55,10 @@ public class LogFileFilterImpl implements LogFileFilter {
         }
     }
 
-    public static class TimestampLogPredicate implements Predicate<String> {
+    public static class TimestampLogPredicate implements Predicate<Text> {
         @Override
-        public boolean test(String log) {
+        public boolean test(Text logText) {
+            String log = logText.getText();
             log = log.trim();
             if (log == null || log.isBlank() || log.isEmpty() || log.length() < 10) {
                 return false;
