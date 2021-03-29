@@ -15,6 +15,8 @@ Java desktop application to filter and analyze logs. Developed with JavaFX.
 
 - Multi tab window.
 
+- Drag&Drop a file to the current window to open it.
+
 - Export the filtered panel to a file.
 
 
