@@ -3,7 +3,6 @@
 <?import javafx.geometry.*?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
-
 <BorderPane fx:id="borderPaneTabFilter" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.log.presentation.controller.TabController">
             <top>
                 <VBox BorderPane.alignment="CENTER">
@@ -102,7 +101,7 @@
             <center>
                 <SplitPane dividerPositions="0.5" orientation="VERTICAL" prefWidth="160.0" BorderPane.alignment="CENTER_RIGHT">
                     <ListView fx:id="sortedLogFileList" onMouseClicked="#handleMouseSortedListClick" onKeyReleased="#handleSortedListKeyPressed" prefWidth="209.0" />
-                    <ListView fx:id="originalLogFileList" prefWidth="609.0" />
+                    <ListView fx:id="originalLogFileList" onMouseClicked="#handleMouseOriginalListClick" onKeyReleased="#handleOriginalListKeyPressed" prefWidth="609.0" />
                 </SplitPane>
             </center>
 </BorderPane>

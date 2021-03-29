@@ -1,5 +1,6 @@
 package org.log.application.usecases;
 
+import javafx.scene.text.Text;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.log.domain.ports.logfile.LogFileOpener;
@@ -14,15 +15,15 @@ public class LogFileOpenerImpl implements LogFileOpener {
     private static final Logger logger = LogManager.getLogger(LogFileOpenerImpl.class);
 
     @Override
-    public List<String> openFile(String fileName) {
-        List<String> logList = new ArrayList<>();
+    public List<Text> openFile(String fileName) {
+        List<Text> logList = new ArrayList<>();
         try {
             File openedFile = new File(fileName);
             Scanner logReader = new Scanner(openedFile);
 
             while (logReader.hasNextLine()) {
                 String logLine = logReader.nextLine();
-                logList.add(logLine);
+                logList.add(new Text(logLine));
             }
             logReader.close();
         } catch (FileNotFoundException e) {

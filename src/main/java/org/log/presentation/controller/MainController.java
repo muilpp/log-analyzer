@@ -7,6 +7,8 @@ import javafx.fxml.Initializable;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.input.Dragboard;
+import javafx.scene.input.TransferMode;
 import javafx.scene.layout.VBox;
 import javafx.stage.FileChooser;
 import javafx.stage.Modality;
@@ -51,6 +53,30 @@ public class MainController implements Initializable {
         logTabPane.getSelectionModel().selectedItemProperty().addListener(
                 (observableValue, tab, t1) -> setCurrentTab(t1)
         );
+
+        setupDragDrop();
+    }
+
+    private void setupDragDrop() {
+        mainVerticalBox.setOnDragOver(event -> {
+            if (event.getGestureSource() != mainVerticalBox
+                    && event.getDragboard().hasFiles()) {
+                event.acceptTransferModes(TransferMode.COPY_OR_MOVE);
+            }
+            event.consume();
+        });
+
+        mainVerticalBox.setOnDragDropped(event -> {
+            Dragboard db = event.getDragboard();
+            boolean success = false;
+            if (db.hasFiles()) {
+                success = true;
+            }
+            openFiles(db.getFiles());
+            event.setDropCompleted(success);
+
+            event.consume();
+        });
     }
 
     public void handleOpenFileMenuClick() {
@@ -58,7 +84,11 @@ public class MainController implements Initializable {
         FileChooser fileChooser = new FileChooser();
         List<File> logFileList = fileChooser.showOpenMultipleDialog(null);
 
-        logFileList.forEach(file -> {
+        openFiles(logFileList);
+    }
+
+    private void openFiles(List<File> files) {
+        files.forEach(file -> {
             if (file != null) {
                 logger.debug("Opening log file: " + file.getAbsolutePath());
                 Stage stage = (Stage) menuBar.getScene().getWindow();
