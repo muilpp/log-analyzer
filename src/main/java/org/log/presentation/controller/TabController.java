@@ -231,7 +231,7 @@ public class TabController implements Initializable {
         StringBuilder stringBuilder = new StringBuilder();
         for (Text log : logList) {
             logger.debug("Found selected: " + log);
-            stringBuilder.append(log).append("\n");
+            stringBuilder.append(log.getText()).append("\n");
         }
         stringBuilder = stringBuilder.replace(stringBuilder.lastIndexOf("\n"), stringBuilder.lastIndexOf("\n")+2, "");
         logger.debug("Added to clipboard: " + stringBuilder.toString());
