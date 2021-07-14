@@ -35,6 +35,10 @@ Clone the repository and then:
 
 *Make sure to have the file *filters.csv* in the same directory from where you run the jar file.*
 
+### Troubleshooting
+
+- Sometimes, depending on the jave version used, the character encoding does not seem to be set correctly, to fix this, run the application with this java version: adoptopenjdk-16-openj9.jdk
+
 ### Contributing
 Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change.
 
