@@ -200,7 +200,7 @@ public class TabController implements Initializable {
             vBox.setSpacing(20);
             vBox.setPadding(new Insets(0, 15, 0, 0));
 
-            if (hBoxRef.hBox.getChildren().size() <= 8) {
+            if (hBoxRef.hBox.getChildren().size() <= 5) {
                 hBoxRef.hBox.getChildren().add(vBox);
             } else {
                 filterCheckBoxes.getChildren().add(0, hBoxRef.hBox);
